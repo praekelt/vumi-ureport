@@ -45,7 +45,7 @@ least a key named ``success``. If the HTTP response code was in the
 ``200`` range, the value of ``success`` will be ``true``. Otherwise,
 the value will be ``false``.
 
-**Example response (succeess)**:
+**Example response (success)**:
 
 .. sourcecode:: http
 
