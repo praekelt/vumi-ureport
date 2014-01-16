@@ -28,10 +28,10 @@ Contents
 * :ref:`api-methods`
 
   * :http:get:`/ureporters/(str:backend)/(str:user_address)`
-  * :http:get:`/ureporters/(str:backend)/(str:user_address)/current_poll`
+  * :http:get:`/ureporters/(str:backend)/(str:user_address)/polls/current`
+  * :http:get:`/ureporters/(str:backend)/(str:user_address)/polls/topics`
   * :http:post:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/responses/`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/summary`
-  * :http:get:`/ureporters/(str:backend)/(str:user_address)/polls/topics`
   * :http:post:`/ureporters/(str:backend)/(str:user_address)/reports/`
 
 
@@ -132,10 +132,14 @@ API methods
       }
 
 
-.. http:get:: /ureporters/(str:backend)/(str:user_address)/current_poll
+.. http:get:: /ureporters/(str:backend)/(str:user_address)/polls/current
 
    Retrieve a decription of the current poll, or a ``null`` poll if
    no poll is currently available.
+
+   This should return either the current registration poll if the
+   Ureporter isn't registered, or the poll the Ureporter should be
+   responding to now if they are registered.
 
    :reqheader Accept: Should be ``application/json``.
    :reqheader Authorization: Optional HTTP Basic authentication.
@@ -184,7 +188,7 @@ API methods
 
    .. sourcecode:: http
 
-      GET /ureporters/vumi_go_sms/+256775551122/current_poll
+      GET /ureporters/vumi_go_sms/+256775551122/polls/current
       Host: example.com
       Accept: application/json
 
@@ -219,6 +223,62 @@ API methods
       {
         "success": true,
         "poll": null,
+      }
+
+
+.. http:get:: /ureporters/(str:backend)/(str:user_address)/polls/topics
+
+   Return a list of the current topics poll results are available for.
+
+   :reqheader Accept: Should be ``application/json``.
+   :reqheader Authorization: Optional HTTP Basic authentication.
+
+   :param str backend:
+       The RapidSMS / U-Report backend the user is utilizing (e.g.
+       ``vumi_go_ussd`` or ``vumi_go_voice``).
+   :param str address:
+       The address of the user (e.g. ``+256775551122``).
+
+   :resheader Content-Type: ``application/json``.
+
+   :statuscode 200: no error
+
+   **Description of the JSON response attributes**:
+
+   The ``poll_topics`` are a JSON list of topics for which there are
+   currently polls. Each poll topic consists of:
+
+   * a ``poll_id`` which is the unique id of the poll for the topic.
+   * a ``label`` which is a human-readable description of the topic
+     in the referred language of the Ureporter specified in the URL.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      POST /ureporters/vumi_go_sms/+256775551122/polls/topics
+      Host: example.com
+      Accept: application/json
+
+   **Example response (success)**:
+
+   .. sourcecode:: http
+
+      HTTP/1.1 200 OK
+      Content-Type: application/json
+
+      {
+        "success": true,
+        "poll_topics: [
+          {
+            "poll_id": "poll-1234",
+            "label": "Topic A",
+          },
+          {
+            "poll_id": "poll-5678",
+            "label": "Topic B",
+          }
+        ]
       }
 
 
@@ -352,63 +412,6 @@ API methods
           ]
         }
       }
-
-
-.. http:get:: /ureporters/(str:backend)/(str:user_address)/polls/topics
-
-   Return a list of the current topics polls are available for.
-
-   :reqheader Accept: Should be ``application/json``.
-   :reqheader Authorization: Optional HTTP Basic authentication.
-
-   :param str backend:
-       The RapidSMS / U-Report backend the user is utilizing (e.g.
-       ``vumi_go_ussd`` or ``vumi_go_voice``).
-   :param str address:
-       The address of the user (e.g. ``+256775551122``).
-
-   :resheader Content-Type: ``application/json``.
-
-   :statuscode 200: no error
-
-   **Description of the JSON response attributes**:
-
-   The ``poll_topics`` are a JSON list of topics for which there are
-   currently polls. Each poll topic consists of:
-
-   * a ``poll_id`` which is the unique id of the poll for the topic.
-   * a ``label`` which is a human-readable description of the topic
-     in the referred language of the Ureporter specified in the URL.
-
-   **Example request**:
-
-   .. sourcecode:: http
-
-      POST /ureporters/vumi_go_sms/+256775551122/polls/topics
-      Host: example.com
-      Accept: application/json
-
-   **Example response (success)**:
-
-   .. sourcecode:: http
-
-      HTTP/1.1 200 OK
-      Content-Type: application/json
-
-      {
-        "success": true,
-        "poll_topics: [
-          {
-            "poll_id": "poll-1234",
-            "label": "Topic A",
-          },
-          {
-            "poll_id": "poll-5678",
-            "label": "Topic B",
-          }
-        ]
-      }
-
 
 
 .. http:post:: /ureporters/(str:backend)/(str:user_address)/reports/
