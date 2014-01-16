@@ -142,6 +142,29 @@ API methods
    :statuscode 200: no error
    :statuscode 404: no user found
 
+   **Description of the JSON response attributes**:
+
+   The ``start_date`` and ``end_date`` fields should be ISO 8601 and
+   RFC 3339 compatible UTC timestamps or ``null``.
+
+   Allowed values for ``response_type``:
+
+   * ``allow_all`` (``a`` in RapidSMS polls)
+   * ``allow_one`` (``o`` in RapidSMS polls)
+
+   Allowed values for ``type``:
+
+   * ``text`` (``t`` in RapidSMS polls)
+   * ``numeric`` (``n`` in RapidSMS polls)
+   * ``registration`` (``r`` in RapidSMS polls)
+   * ``location`` (``l`` in RapidSMS polls)
+   * ``other`` (all other RapidSMS polls)
+
+   Updates to this API may extend the list of allowed ``type`` values.
+
+   The ``default_response`` is the default text to send to submissions to
+   this poll or ``null`` if there is no default.
+
    **Example request**:
 
    .. sourcecode:: http
@@ -165,9 +188,9 @@ API methods
           "question": "What is your quest?",
           "start_date": "2012-04-23T18:25:43.511Z",
           "end_date": null,
-          "type": "t",
+          "type": "text",
           "default_response": null,
-          "response_type": "a",
+          "response_type": "allow_all",
         }
       }
 
@@ -176,20 +199,6 @@ API methods
       We still need to add a parameter here for custom voice recordings.
       Maybe ``"wav": "http://example.com/voice/12345.wav"``? If no voice
       recording is available, Vumi will attempt to generate one.
-
-   .. note::
-
-      The ``start_date`` and ``end_date`` fields should be ISO 8601 and
-      RFC 3339 compatible UTC timestamps or ``null``.
-
-      A ``response_type`` is either ``a`` (for allow all) or ``o`` (for allow
-      one).
-
-      Common values of ``type`` are ``t`` (text), ``n`` (numeric),
-      ``l`` (location) or ``r`` (registration), but other types may also exist.
-
-      The ``default_response`` is the default text to send to submissions to
-      this poll or ``null`` if there is no default.
 
    **Example response (success, no current poll available)**:
 
