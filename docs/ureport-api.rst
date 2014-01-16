@@ -32,7 +32,7 @@ Contents
   * :http:post:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/submit`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/result`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/polls/topics`
-  * :http:post:`/ureporters/(str:backend)/(str:user_address)/submit_report`
+  * :http:post:`/ureporters/(str:backend)/(str:user_address)/reports/submit`
 
 
 .. _response-format-overview:
@@ -386,7 +386,7 @@ API methods
 
 
 
-.. http:post:: /ureporters/(str:backend)/(str:user_address)/submit_report
+.. http:post:: /ureporters/(str:backend)/(str:user_address)/reports/submit
 
    Submit a Ureport.
 
