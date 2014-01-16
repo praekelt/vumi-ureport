@@ -96,7 +96,7 @@ API methods
    **Description of the JSON response attributes**:
 
    The ``registered`` parameter is ``true`` if the Ureporter has
-   completed registration and false otherwise.
+   completed registration and ``false`` otherwise.
 
    The ``language`` parameter should be a two-letter language code
    as defined in ISO 639-1 or ``null`` if the Ureporter's preferred
