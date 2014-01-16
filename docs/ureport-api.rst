@@ -304,9 +304,22 @@ API methods
 
    **Description of the JSON response attributes**:
 
-   .. warning::
+   A ``poll_result`` has the following attributes:
 
-      We need to define what a poll result consists of.
+   * ``total_responses`` which is a count of the total number of
+     responses received.
+
+   * ``responses`` which is a list summarizing the received
+     responses. Each summary entry has a:
+
+     * ``label`` which gives a human-readable name for the response in
+       the Ureporters preferred language.
+
+     * ``count`` which gives the number of times this response was
+       received.
+
+   The percentage of times each response was received should be
+   ``(count / total_responses) * 100``.
 
    **Example request**:
 
@@ -327,7 +340,7 @@ API methods
         "success": true,
         "poll_result": {
           "total_responses": 3756,
-          "stats": [
+          "responses": [
             {
               "label": "Choice 1",
               "count": 1234
