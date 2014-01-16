@@ -29,10 +29,10 @@ Contents
 
   * :http:get:`/ureporters/(str:backend)/(str:user_address)`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/current_poll`
-  * :http:post:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/submit`
-  * :http:get:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/result`
+  * :http:post:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/responses`
+  * :http:get:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/summary`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/polls/topics`
-  * :http:post:`/ureporters/(str:backend)/(str:user_address)/reports/submit`
+  * :http:post:`/ureporters/(str:backend)/(str:user_address)/reports`
 
 
 .. _response-format-overview:
@@ -222,7 +222,7 @@ API methods
       }
 
 
-.. http:post:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/submit
+.. http:post:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/responses
 
    Submit a result for a poll.
 
@@ -258,7 +258,7 @@ API methods
 
    .. sourcecode:: http
 
-      POST /ureporters/vumi_go_sms/+256775551122/poll/poll-1234/submit
+      POST /ureporters/vumi_go_sms/+256775551122/poll/poll-1234/responses
       Host: example.com
       Accept: application/json
 
@@ -282,7 +282,9 @@ API methods
       }
 
 
-.. http:get:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/result
+.. http:get:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/summary
+
+   Returns a summary of the poll results.
 
    :reqheader Accept: Should be ``application/json``.
    :reqheader Authorization: Optional HTTP Basic authentication.
@@ -293,7 +295,7 @@ API methods
    :param str address:
        The address of the user (e.g. ``+256775551122``).
    :param str poll_id:
-       The ``id`` of the poll the response is being submitted to.
+       The ``id`` of the poll to retrieve a summary for.
 
    :resheader Content-Type: ``application/json``.
 
@@ -310,7 +312,7 @@ API methods
 
    .. sourcecode:: http
 
-      POST /ureporters/vumi_go_sms/+256775551122/poll/poll-1234/result
+      POST /ureporters/vumi_go_sms/+256775551122/poll/poll-1234/summary
       Host: example.com
       Accept: application/json
 
@@ -324,7 +326,17 @@ API methods
       {
         "success": true,
         "poll_result": {
-          ...
+          "total_responses": 3756,
+          "stats": [
+            {
+              "label": "Choice 1",
+              "count": 1234
+            },
+            {
+              "label": "Choice 2",
+              "count": 2522
+            }
+          ]
         }
       }
 
@@ -386,7 +398,7 @@ API methods
 
 
 
-.. http:post:: /ureporters/(str:backend)/(str:user_address)/reports/submit
+.. http:post:: /ureporters/(str:backend)/(str:user_address)/reports
 
    Submit a Ureport.
 
@@ -417,7 +429,7 @@ API methods
 
    .. sourcecode:: http
 
-      POST /ureporters/vumi_go_sms/+256775551122/submit_report
+      POST /ureporters/vumi_go_sms/+256775551122/reports
       Host: example.com
       Accept: application/json
 
