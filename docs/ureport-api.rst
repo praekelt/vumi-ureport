@@ -29,9 +29,9 @@ Contents
 
   * :http:get:`/ureporters/(str:backend)/(str:user_address)`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/current_poll`
-  * :http:post:`/ureporters/(str:backend)/(str:user_address)/submit_poll/(str:poll_id)`
-  * :http:get:`/ureporters/(str:backend)/(str:user_address)/poll_result/(str:poll_id)`
-  * :http:get:`/ureporters/(str:backend)/(str:user_address)/poll_topics`
+  * :http:post:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/submit`
+  * :http:get:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/result`
+  * :http:get:`/ureporters/(str:backend)/(str:user_address)/polls/topics`
   * :http:post:`/ureporters/(str:backend)/(str:user_address)/submit_report`
 
 
@@ -213,7 +213,7 @@ API methods
       }
 
 
-.. http:post:: /ureporters/(str:backend)/(str:user_address)/submit_poll/(str:poll_id)
+.. http:post:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/submit
 
    Submit a result for a poll.
 
@@ -240,7 +240,7 @@ API methods
 
    .. sourcecode:: http
 
-      POST /ureporters/vumi_go_sms/+256775551122/submit_poll/poll-1234
+      POST /ureporters/vumi_go_sms/+256775551122/poll/poll-1234/submit
       Host: example.com
       Accept: application/json
 
@@ -273,7 +273,7 @@ API methods
       Ureporter, or ``null``.
 
 
-.. http:get:: /ureporters/(str:backend)/(str:user_address)/poll_result/(str:poll_id)
+.. http:get:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/result
 
    :reqheader Accept: Should be ``application/json``.
    :reqheader Authorization: Optional HTTP Basic authentication.
@@ -295,7 +295,7 @@ API methods
 
    .. sourcecode:: http
 
-      POST /ureporters/vumi_go_sms/+256775551122/poll_result/poll-1234
+      POST /ureporters/vumi_go_sms/+256775551122/poll/poll-1234/result
       Host: example.com
       Accept: application/json
 
@@ -318,7 +318,7 @@ API methods
          We need to define what a poll result consists of.
 
 
-.. http:get:: /ureporters/(str:backend)/(str:user_address)/poll_topics
+.. http:get:: /ureporters/(str:backend)/(str:user_address)/polls/topics
 
    Return a list of the current topics polls are available for.
 
@@ -339,7 +339,7 @@ API methods
 
    .. sourcecode:: http
 
-      POST /ureporters/vumi_go_sms/+256775551122/poll_topics
+      POST /ureporters/vumi_go_sms/+256775551122/polls/topics
       Host: example.com
       Accept: application/json
 
