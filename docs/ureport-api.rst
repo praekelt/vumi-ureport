@@ -236,6 +236,15 @@ API methods
    :statuscode 200: no error
    :statuscode 404: poll not found
 
+   **Description of the JSON response attributes**:
+
+   The ``accepted`` parameter is true if the response was accepted
+   as valid (i.e. the poll is complete) or ``false`` if the
+   response was invalid.
+
+   The ``response`` is either additional text to send to the
+   Ureporter, or ``null``.
+
    **Example request**:
 
    .. sourcecode:: http
@@ -262,15 +271,6 @@ API methods
           "response": "Thank you for answering the poll."
         }
       }
-
-   .. note::
-
-      The ``accepted`` parameter is true if the response was accepted
-      as valid (i.e. the poll is complete) or ``false`` if the
-      response was invalid.
-
-      The ``response`` is either additional text to send to the
-      Ureporter, or ``null``.
 
 
 .. http:get:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/result
@@ -383,6 +383,15 @@ API methods
 
    :statuscode 200: no error
    :statuscode 404: ureporter not found
+
+   **Description of the JSON response attributes**:
+
+   The ``accepted`` parameter is true if the response was accepted
+   as valid (i.e. the poll is complete) or ``false`` if the
+   response was invalid.
+
+   The ``response`` is either additional text to send to the
+   Ureporter, or ``null``.
 
    **Example request**:
 
