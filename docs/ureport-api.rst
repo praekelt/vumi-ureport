@@ -29,10 +29,10 @@ Contents
 
   * :http:get:`/ureporters/(str:backend)/(str:user_address)`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/current_poll`
-  * :http:post:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/responses`
+  * :http:post:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/responses/`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/summary`
   * :http:get:`/ureporters/(str:backend)/(str:user_address)/polls/topics`
-  * :http:post:`/ureporters/(str:backend)/(str:user_address)/reports`
+  * :http:post:`/ureporters/(str:backend)/(str:user_address)/reports/`
 
 
 .. _response-format-overview:
@@ -222,7 +222,7 @@ API methods
       }
 
 
-.. http:post:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/responses
+.. http:post:: /ureporters/(str:backend)/(str:user_address)/poll/(str:poll_id)/responses/
 
    Submit a result for a poll.
 
@@ -258,7 +258,7 @@ API methods
 
    .. sourcecode:: http
 
-      POST /ureporters/vumi_go_sms/+256775551122/poll/poll-1234/responses
+      POST /ureporters/vumi_go_sms/+256775551122/poll/poll-1234/responses/
       Host: example.com
       Accept: application/json
 
@@ -411,7 +411,7 @@ API methods
 
 
 
-.. http:post:: /ureporters/(str:backend)/(str:user_address)/reports
+.. http:post:: /ureporters/(str:backend)/(str:user_address)/reports/
 
    Submit a Ureport.
 
@@ -442,7 +442,7 @@ API methods
 
    .. sourcecode:: http
 
-      POST /ureporters/vumi_go_sms/+256775551122/reports
+      POST /ureporters/vumi_go_sms/+256775551122/reports/
       Host: example.com
       Accept: application/json
 
