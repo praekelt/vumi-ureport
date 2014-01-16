@@ -93,6 +93,20 @@ API methods
    :statuscode 200: no error
    :statuscode 404: no user found
 
+   **Description of the JSON response attributes**:
+
+   The ``registered`` parameter is ``true`` if the Ureporter has
+   completed registration and false otherwise.
+
+   The ``language`` parameter should be a two-letter language code
+   as defined in ISO 639-1 or ``null`` if the Ureporter's preferred
+   language is not yet known.
+
+   .. warning::
+
+      If anyone would like to suggest extra fields to return for the user,
+      that would be useful.
+
    **Example request**:
 
    .. sourcecode:: http
@@ -116,11 +130,6 @@ API methods
             "language": "sw",
         }
       }
-
-   .. warning::
-
-      If anyone would like to suggest extra fields to return for the user,
-      that would be useful.
 
 
 .. http:get:: /ureporters/(str:backend)/(str:user_address)/current_poll
@@ -165,6 +174,12 @@ API methods
    The ``default_response`` is the default text to send to submissions to
    this poll or ``null`` if there is no default.
 
+   .. warning::
+
+      We still need to add a parameter here for custom voice recordings.
+      Maybe ``"wav": "http://example.com/voice/12345.wav"``? If no voice
+      recording is available, Vumi will attempt to generate one.
+
    **Example request**:
 
    .. sourcecode:: http
@@ -193,12 +208,6 @@ API methods
           "response_type": "allow_all",
         }
       }
-
-   .. warning::
-
-      We still need to add a parameter here for custom voice recordings.
-      Maybe ``"wav": "http://example.com/voice/12345.wav"``? If no voice
-      recording is available, Vumi will attempt to generate one.
 
    **Example response (success, no current poll available)**:
 
@@ -291,6 +300,12 @@ API methods
    :statuscode 200: no error
    :statuscode 404: poll not found
 
+   **Description of the JSON response attributes**:
+
+   .. warning::
+
+      We need to define what a poll result consists of.
+
    **Example request**:
 
    .. sourcecode:: http
@@ -313,10 +328,6 @@ API methods
         }
       }
 
-      .. warning::
-
-         We need to define what a poll result consists of.
-
 
 .. http:get:: /ureporters/(str:backend)/(str:user_address)/polls/topics
 
@@ -334,6 +345,15 @@ API methods
    :resheader Content-Type: ``application/json``.
 
    :statuscode 200: no error
+
+   **Description of the JSON response attributes**:
+
+   The ``poll_topics`` are a JSON list of topics for which there are
+   currently polls. Each poll topic consists of:
+
+   * a ``poll_id`` which is the unique id of the poll for the topic.
+   * a ``label`` which is a human-readable description of the topic
+     in the referred language of the Ureporter specified in the URL.
 
    **Example request**:
 
