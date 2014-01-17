@@ -157,13 +157,34 @@ API methods
 
    **Description of the JSON response attributes**:
 
+   The JSON response contains a ``poll`` object with the following attributes:
+
+   * ``id``: The poll id.
+   * ``language``: The two-letter language code specifying the language used
+     by the ``name``, ``question`` and ``default_response`` fields.
+   * ``name``: The name of the poll (in the Ureporter's preferred language).
+   * ``question``: The poll text (in the Ureporter's preferred language).
+   * ``question_voice``: A URL from which a sound file containing a custom
+     reading of the ``question`` may be retrieved, or ``null``. See below for
+     further details.
+   * ``start_date``: The date and time on which the poll began (or will begin).
+   * ``end_date``: The date and time on which the poll ended (or will end).
+   * ``type``: The data type of responses to the question. See below for
+     the possible values.
+   * ``default_response``: The ``default_response`` is the default text to
+     send to submissions to this poll or ``null`` if there is no default.
+   * ``default_response_voice``: A URL from which a sound file containing a
+     custom reading of the ``default_response`` may be retrieved, or ``null``.
+     If ``default_response`` is ``null``, this should also be ``null``.
+     See below for further details.
+   * ``response_type``: Whether the poll may be answered multiple times or
+     not. See below for possible values.
+
+   The ``language`` parameter should be a two-letter language code
+   as defined in ISO 639-1. It may **not** be ``null``.
+
    The ``start_date`` and ``end_date`` fields should be ISO 8601 and
    RFC 3339 compatible UTC timestamps or ``null``.
-
-   Allowed values for ``response_type``:
-
-   * ``allow_all`` (``a`` in RapidSMS polls)
-   * ``allow_one`` (``o`` in RapidSMS polls)
 
    Allowed values for ``type``:
 
@@ -175,14 +196,23 @@ API methods
 
    Updates to this API may extend the list of allowed ``type`` values.
 
-   The ``default_response`` is the default text to send to submissions to
-   this poll or ``null`` if there is no default.
+   Allowed values for ``response_type``:
 
-   .. warning::
+   * ``allow_all`` (``a`` in RapidSMS polls)
+   * ``allow_one`` (``o`` in RapidSMS polls)
 
-      We still need to add a parameter here for custom voice recordings.
-      Maybe ``"wav": "http://example.com/voice/12345.wav"``? If no voice
-      recording is available, Vumi will attempt to generate one.
+   The values of ``question_voice`` or ``default_response_voice`` may be
+   a URL from which a sound file maybe be retrieved or ``null``. If the
+   value is a URL, a GET request to the URL should return a sound file in
+   ``.ogg``, ``.mp3`` or ``.wav`` format along with an appropriate
+   ``Content-Type`` header. The ``.ogg`` format using one of the Xiph.org
+   free codecs (Speex, Vorbis, Opus or FLAC) is recommended.
+
+   If ``question_voice`` or ``default_response_voice`` is ``null`` and
+   the backend in use is a voice backend, the API client is expected
+   to use a suitable text-to-speech engine to generate a fallback
+   sound file from the poll ``question`` or ``default_response`` as
+   appropriate.
 
    **Example request**:
 
@@ -203,12 +233,15 @@ API methods
         "success": true,
         "poll": {
           "id": "1234",
+          "language": "en",
           "name": "Poll 1",
           "question": "What is your quest?",
+          "question_voice": "http://www.example.com/poll1234.ogg",
           "start_date": "2012-04-23T18:25:43.511Z",
           "end_date": null,
           "type": "text",
           "default_response": null,
+          "default_response_voice": null,
           "response_type": "allow_all",
         }
       }
