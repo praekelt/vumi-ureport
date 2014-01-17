@@ -192,9 +192,14 @@ API methods
    * ``numeric`` (``n`` in RapidSMS polls)
    * ``registration`` (``r`` in RapidSMS polls)
    * ``location`` (``l`` in RapidSMS polls)
+   * ``none`` (see below)
    * ``other`` (all other RapidSMS polls)
 
    Updates to this API may extend the list of allowed ``type`` values.
+
+   Polls of type ``none`` require no response from the user and responses
+   to such polls should not be submitted to UReport. These polls are
+   informational messages (and are typically used during registration).
 
    Allowed values for ``response_type``:
 
