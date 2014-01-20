@@ -25,6 +25,7 @@ Contents
 --------
 
 * :ref:`response-format-overview`
+* :ref:`api-authentication`
 * :ref:`api-methods`
 
   * :http:get:`/ureporters/(str:backend)/(str:user_address)`
@@ -68,6 +69,16 @@ the value will be ``false``.
      "success": false,
      "reason": "Ureporter not found"
    }
+
+
+.. _api-authentication:
+
+API Authentication
+------------------
+
+The preferred method of API authentication is HTTPS combined with HTTP
+Basic authentication. Servers may require authentication. Clients should
+optionally require authentication if authentication credentials are supplied.
 
 
 .. _api-methods:
