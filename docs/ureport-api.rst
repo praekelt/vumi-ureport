@@ -136,8 +136,7 @@ API methods
       {
         "success": true,
         "user": {
-            "id": "1234",
-            "registered": false,
+            "registered": true,
             "language": "sw",
         }
       }
