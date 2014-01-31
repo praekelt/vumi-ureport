@@ -1,2 +1,4 @@
 *.swp
 /node_modules/
+/ve/*
+/docs/_build/*
