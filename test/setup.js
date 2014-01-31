@@ -1,3 +1,6 @@
+var path = require('path');
 require('mocha-as-promised')();
-require('../src');
-require('../src/app');
+
+require('../paths').forEach(function(p) {
+    require(path.join('..', p));
+});

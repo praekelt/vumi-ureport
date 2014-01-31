@@ -1,4 +1,6 @@
 module.exports = function (grunt) {
+    var paths = require('./paths');
+
     grunt.loadNpmTasks('grunt-mocha-test');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -7,11 +9,8 @@ module.exports = function (grunt) {
         paths: {
             dest: 'lib/vumi-ureport.js',
             src: {
-                app: [
-                    'src/index.js',
-                    'src/app.js',
-                    'src/init.js'
-                ]
+                app: paths,
+                init: 'src/init.js'
             },
             test: {
                 spec: [
@@ -26,7 +25,8 @@ module.exports = function (grunt) {
         watch: {
             app: {
                 files: [
-                    '<%= paths.src.app %>'
+                    '<%= paths.src.app %>',
+                    '<%= paths.src.init %>'
                 ],
                 tasks: ['build']
             }
@@ -34,7 +34,10 @@ module.exports = function (grunt) {
 
         concat: {
             app: {
-                src: ['<%= paths.src.app %>'],
+                src: [
+                    '<%= paths.src.app %>',
+                    '<%= paths.src.init %>'
+                ],
                 dest: '<%= paths.dest %>'
             },
         },
