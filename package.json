@@ -1,0 +1,34 @@
+{
+  "name": "vumi-ureport",
+  "version": "0.0.0",
+  "description": "The vumi jsbox application for the U-Report project",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/praekelt/vumi-ureport.git"
+  },
+  "keywords": [
+    "vumi",
+    "U-Report"
+  ],
+  "author": "Praekelt Foundation",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/praekelt/vumi-ureport/issues"
+  },
+  "homepage": "https://github.com/praekelt/vumi-ureport",
+  "dependencies": {
+    "vumigo_v02": "~0.2",
+    "q": "~0.9"
+  },
+  "devDependencies": {
+    "mocha-as-promised": "~2.0.0",
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.1",
+    "grunt-mocha-test": "~0.6.2",
+    "grunt-contrib-concat": "~0.3.0"
+  }
+}
