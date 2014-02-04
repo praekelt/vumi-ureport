@@ -1,0 +1,141 @@
+vumi_ureport.api = function() {
+    var vumigo = require('vumigo_v02');
+    var utils = vumigo.utils;
+    var Extendable = utils.Extendable;
+
+    var JsonApi = vumigo.http_api.JsonApi;
+    var HttpResponseError = vumigo.http_api.HttpResponseError;
+
+    var UReportApi = Extendable.extend(function(self, im, base_url, backend) {
+        self.im = im;
+        self.http = new JsonApi(im);
+        self.base_url = base_url;
+        self.backend = backend;
+
+        self.url = function(path) {
+            var parts = [self.base_url];
+
+            if (path) {
+                parts.push(path);
+            }
+
+            return parts.join('/');
+        };
+
+        self.ureporters = function(user_addr) {
+            return new UReportersApi(self, user_addr);
+        };
+    });
+
+    var UReportersApi = Extendable.extend(function(self, api, user_addr) {
+        self.api = api;
+        self.user_addr = user_addr;
+
+        self.url = function(path) {
+            var parts = ['ureporters', self.api.backend, self.user_addr];
+
+            if (path) {
+                parts.push(path);
+            }
+
+            return self.api.url(parts.join('/'));
+        };
+
+        self.get = function() {
+            return self
+                .api.http.get(self.url())
+                .get('data')
+                .get('user');
+        };
+
+        self.is_registered = function() {
+            return self
+                .get()
+                .get('registered')
+                .catch(catch_code(404, false));
+        };
+
+        self.polls = {};
+
+        self.polls.current = function() {
+            return self
+                .api.http.get(self.url('polls/current'))
+                .get('data')
+                .get('poll');
+        };
+
+        self.polls.topics = function() {
+            return self
+                .api.http.get(self.url('polls/topics'))
+                .get('data')
+                .get('poll_topics');
+        };
+
+        self.poll = function(id) {
+            return new PollApi(self, id);
+        };
+
+        self.reports = {};
+        self.reports.submit = function(report) {
+            return self
+                .api.http.post(self.url('reports/'), {
+                    data: {report: report}
+                })
+                .get('data')
+                .get('result');
+        };
+    });
+
+    var PollApi = Extendable.extend(function(self, ureporter, id) {
+        self.id = id;
+        self.api = ureporter.api;
+        self.ureporter = ureporter;
+
+        self.url = function(path) {
+            var parts = ['poll', self.id];
+
+            if (path) {
+                parts.push(path);
+            }
+
+            return self.ureporter.url(parts.join('/'));
+        };
+
+        self.responses = {};
+
+        self.responses.submit = function(response) {
+            return self
+                .api.http.post(self.url('responses/'), {
+                    data: {response: response}
+                })
+                .get('data')
+                .get('result');
+        };
+
+        self.summary = function() {
+            return self
+                .api.http.get(self.url('summary'))
+                .get('data')
+                .get('poll_result');
+        };
+    });
+
+    function catch_code(code, result) {
+        return function(e) {
+            var match = e instanceof HttpResponseError
+                     && e.response.code === code;
+
+            if (!match) {
+                throw e;
+            }
+
+            return utils.maybe_call(result);
+        };
+    }
+
+    return {
+        UReportApi: UReportApi,
+        UReportersApi: UReportersApi,
+        PollApi: PollApi
+    };
+}();
