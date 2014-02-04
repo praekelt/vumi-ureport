@@ -418,12 +418,15 @@ API methods
 
    * ``total_responses`` which is a count of the total number of
      responses received.
+     
+   * ``total_categorized_responses`` which is the sum of responses by
+     category. A response can belong to more than one category 
 
    * ``responses`` which is a list summarizing the received
-     responses. Each summary entry has a:
+     responses by category. Each summary entry has a:
 
-     * ``label`` which gives a human-readable name for the response in
-       the Ureporters preferred language.
+     * ``name`` which gives a human-readable name for the categorized
+       responses in the Ureporters preferred language.
 
      * ``count`` which gives the number of times this response was
        received.
