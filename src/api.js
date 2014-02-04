@@ -6,33 +6,53 @@ vumi_ureport.api = function() {
     var JsonApi = vumigo.http_api.JsonApi;
     var HttpResponseError = vumigo.http_api.HttpResponseError;
 
-    var UReportApi = Extendable.extend(function(self, im, base_url, opts) {
-        self.http = JsonApi.call(self, im, opts);
+    var UReportApi = Extendable.extend(function(self, im, base_url, backend) {
+        self.im = im;
+        self.http = new JsonApi(im);
         self.base_url = base_url;
+        self.backend = backend;
 
-        self.url = function(paths) {
-            return [self.base_url, paths].join('/');
+        self.url = function(path) {
+            var parts = [self.base_url];
+
+            if (path) {
+                parts.push(path);
+            }
+
+            return parts.join('/');
         };
 
-        self.ureporters = function(backend, user_addr) {
-            return new UReportersApi(self, backend, user_addr);
+        self.ureporters = function(user_addr) {
+            return new UReportersApi(self, user_addr);
         };
     });
 
-    var UReportersApi = Extendable.extend(function(self, api, backend, user_addr) {
+    var UReportersApi = Extendable.extend(function(self, api, user_addr) {
         self.api = api;
-        self.backend = backend;
         self.user_addr = user_addr;
 
         self.url = function(path) {
-            return self.api.url(['ureporters', path].join('/'));
+            var parts = ['ureporters', self.api.backend, self.user_addr];
+
+            if (path) {
+                parts.push(path);
+            }
+
+            return self.api.url(parts.join('/'));
         };
 
         self.get = function() {
             return self
                 .api.http.get(self.url())
-                .get('user')
-                .catch(catch_code(404, null));
+                .get('data')
+                .get('user');
+        };
+
+        self.is_registered = function() {
+            return self
+                .get()
+                .get('registered')
+                .catch(catch_code(404, false));
         };
 
         self.polls = {};
@@ -40,12 +60,14 @@ vumi_ureport.api = function() {
         self.polls.current = function() {
             return self
                 .api.http.get(self.url('polls/current'))
+                .get('data')
                 .get('poll');
         };
 
         self.polls.topics = function() {
             return self
                 .api.http.get(self.url('polls/topics'))
+                .get('data')
                 .get('poll_topics');
         };
 
@@ -59,6 +81,7 @@ vumi_ureport.api = function() {
                 .api.http.post(self.url('reports/'), {
                     data: {report: report}
                 })
+                .get('data')
                 .get('result');
         };
     });
@@ -68,11 +91,14 @@ vumi_ureport.api = function() {
         self.api = ureporter.api;
         self.ureporter = ureporter;
 
-        self.url = function(paths) {
-            return self.ureporter.url([
-                'poll',
-                self.id
-            ].join('/'));
+        self.url = function(path) {
+            var parts = ['poll', self.id];
+
+            if (path) {
+                parts.push(path);
+            }
+
+            return self.ureporter.url(parts.join('/'));
         };
 
         self.responses = {};
@@ -82,12 +108,14 @@ vumi_ureport.api = function() {
                 .api.http.post(self.url('responses/'), {
                     data: {response: response}
                 })
+                .get('data')
                 .get('result');
         };
 
         self.summary = function() {
             return self
                 .api.http.get(self.url('summary'))
+                .get('data')
                 .get('poll_result');
         };
     });
@@ -95,7 +123,7 @@ vumi_ureport.api = function() {
     function catch_code(code, result) {
         return function(e) {
             var match = e instanceof HttpResponseError
-                     && e.reponse.code === code;
+                     && e.response.code === code;
 
             if (!match) {
                 throw e;
