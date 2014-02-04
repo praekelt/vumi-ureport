@@ -13,32 +13,21 @@ vumi_ureport.api = function() {
         self.backend = backend;
 
         self.url = function(path) {
-            var parts = [self.base_url];
-
-            if (path) {
-                parts.push(path);
-            }
-
-            return parts.join('/');
+            return join_paths(self.base_url, path);
         };
 
         self.ureporters = function(user_addr) {
-            return new UReportersApi(self, user_addr);
+            var rel_path = join_paths('ureporters', self.backend, user_addr);
+            return new UReportersApi(self, rel_path);
         };
     });
 
-    var UReportersApi = Extendable.extend(function(self, api, user_addr) {
+    var UReportersApi = Extendable.extend(function(self, api, rel_path) {
         self.api = api;
-        self.user_addr = user_addr;
+        self.rel_path = rel_path;
 
         self.url = function(path) {
-            var parts = ['ureporters', self.api.backend, self.user_addr];
-
-            if (path) {
-                parts.push(path);
-            }
-
-            return self.api.url(parts.join('/'));
+            return self.api.url(join_paths(self.rel_path, path));
         };
 
         self.get = function() {
@@ -72,7 +61,7 @@ vumi_ureport.api = function() {
         };
 
         self.poll = function(id) {
-            return new PollApi(self, id);
+            return new PollApi(self, join_paths('poll', id));
         };
 
         self.reports = {};
@@ -86,19 +75,13 @@ vumi_ureport.api = function() {
         };
     });
 
-    var PollApi = Extendable.extend(function(self, ureporter, id) {
-        self.id = id;
+    var PollApi = Extendable.extend(function(self, ureporter, rel_path) {
         self.api = ureporter.api;
         self.ureporter = ureporter;
+        self.rel_path = rel_path;
 
         self.url = function(path) {
-            var parts = ['poll', self.id];
-
-            if (path) {
-                parts.push(path);
-            }
-
-            return self.ureporter.url(parts.join('/'));
+            return self.ureporter.url(join_paths(self.rel_path, path));
         };
 
         self.responses = {};
@@ -131,6 +114,16 @@ vumi_ureport.api = function() {
 
             return utils.maybe_call(result);
         };
+    }
+
+    function join_paths() {
+        var args = Array.prototype.slice.call(arguments);
+
+        return args
+            .filter(function(path) {
+                return !!path;
+            })
+            .join('/');
     }
 
     return {
