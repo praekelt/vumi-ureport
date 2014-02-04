@@ -117,13 +117,9 @@ vumi_ureport.api = function() {
     }
 
     function join_paths() {
-        var args = Array.prototype.slice.call(arguments);
-
-        return args
-            .filter(function(path) {
-                return !!path;
-            })
-            .join('/');
+        return Array.prototype.filter.call(arguments, function(path) {
+            return !!path;
+        }).join('/');
     }
 
     return {
