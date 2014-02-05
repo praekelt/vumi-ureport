@@ -280,6 +280,8 @@ API methods
 
    Return a list of the current topics poll results are available for.
 
+   Only **open** polls are returned in the results.
+
    :reqheader Accept: Should be ``application/json``.
    :reqheader Authorization: Optional HTTP Basic authentication.
 
@@ -296,7 +298,7 @@ API methods
    **Description of the JSON response attributes**:
 
    The ``poll_topics`` are a JSON list of topics for which there are
-   currently polls. Each poll topic consists of:
+   currently open polls. Each poll topic consists of:
 
    * a ``poll_id`` which is the unique id of the poll for the topic.
    * a ``label`` which is a human-readable description of the topic
