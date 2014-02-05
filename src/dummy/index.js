@@ -1,0 +1,1 @@
+vumi_ureport.dummy = {};
