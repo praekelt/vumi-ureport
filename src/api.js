@@ -5,6 +5,7 @@ vumi_ureport.api = function() {
 
     var JsonApi = vumigo.http_api.JsonApi;
     var HttpResponseError = vumigo.http_api.HttpResponseError;
+    var join_paths = vumi_ureport.utils.join_paths;
 
     var UReportApi = Extendable.extend(function(self, im, base_url, backend) {
         self.im = im;
@@ -114,12 +115,6 @@ vumi_ureport.api = function() {
 
             return utils.maybe_call(result);
         };
-    }
-
-    function join_paths() {
-        return Array.prototype.filter.call(arguments, function(path) {
-            return !!path;
-        }).join('/');
     }
 
     return {

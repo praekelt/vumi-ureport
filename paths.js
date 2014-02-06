@@ -2,6 +2,7 @@ var src = exports.src = {};
 
 src.app = [
     'src/index.js',
+    'src/utils.js',
     'src/api.js',
     'src/app.js'
 ];
