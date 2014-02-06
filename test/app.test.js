@@ -1,14 +1,14 @@
 var vumigo = require('vumigo_v02');
 var AppTester = vumigo.AppTester;
-var VumiUreportApp = vumi_ureport.app.VumiUreportApp;
+var VumiUReportApp = vumi_ureport.app.VumiUReportApp;
 
 
-describe("VumiUreport", function() {
+describe("VumiUReport", function() {
     var app;
     var tester;
 
     beforeEach(function() {
-        app = new VumiUreportApp();
+        app = new VumiUReportApp();
         tester = new AppTester(app);
     });
 

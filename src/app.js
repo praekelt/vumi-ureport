@@ -4,7 +4,7 @@ vumi_ureport.app = function() {
     var EndState = vumigo.states.EndState;
 
 
-    var VumiUreportApp = App.extend(function(self) {
+    var VumiUReportApp = App.extend(function(self) {
         App.call(self, 'initial_state');
 
         self.init = function() {
@@ -17,6 +17,6 @@ vumi_ureport.app = function() {
 
 
     return {
-        VumiUreportApp: VumiUreportApp
+        VumiUReportApp: VumiUReportApp
     };
 }();
