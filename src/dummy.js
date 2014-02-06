@@ -7,50 +7,74 @@ var Extendable = utils.Extendable;
 
 
 vumi_ureport.dummy = function() {
-    var DummyUReportApi = Extendable.extend(function(self) {
-        self.ureporters = utils.functor(new DummyUReportersApi());
+    var Stubs = Extendable.extend(function(self, type) {
+        self = sinon.stub();
+
+        var withArgs = self.withArgs;
+        self.withArgs = function() {
+            var other = new type();
+            withArgs.apply(self, arguments).returns(other);
+            return other;
+        };
+
+        self.returns(self);
+        return self;
     });
 
-    var DummyUReportersApi = Extendable.extend(function(self) {
-        self.get = stub('ureporters.get');
+    var Stub = Extendable.extend(function(self, stub_name) {
+        self = sinon.stub();
+        self.stub_name = stub_name;
 
-        self.polls = {};
-        self.polls.current = stub('ureporters.polls.current');
-        self.polls.topics = stub('ureporters.polls.topics');
-
-        self.reports = {};
-        self.reports.submit = stub('ureporters.reports.submit');
-
-        self.poll = utils.functor(new DummyPollApi());
-    });
-
-    var DummyPollApi = Extendable.extend(function(self) {
-        self.responses = {};
-        self.responses.submit = stub('ureporters.poll.responses.submit');
-
-        self.summary = stub('ureporters.poll.summary');
-    });
-
-    function stub(name) {
-        var s = sinon.stub();
-        var invoke = s.invoke;
-
-        s.invoke = function() {
+        var invoke = self.invoke;
+        self.invoke = function() {
             return Q(invoke.apply(this, arguments)).delay(0);
         };
 
-        s.returns(Q().then(function() {
-            throw new Error("No return value provided for '" + name + "'");
+        self.returns(Q().then(function() {
+            throw new Error(
+                "No return value provided for '" + self.stub_name + "'");
         }));
 
-        s._name_ = name;
-        return s;
-    }
+        return self;
+    });
+
+    var DummyUReportApi = Extendable.extend(function(self) {
+        self.ureporters = new DummyUReportersApi();
+    });
+
+    var DummyUReportersApi = Stubs.extend(function(self) {
+        self = Stubs.call(self, DummyUReportersApi);
+
+        self.get = new Stub('ureporters.get');
+
+        self.polls = {};
+        self.polls.current = new Stub('ureporters.polls.current');
+        self.polls.topics = new Stub('ureporters.polls.topics');
+
+        self.reports = {};
+        self.reports.submit = new Stub('ureporters.reports.submit');
+
+        self.poll = new DummyPollApi();
+
+        return self;
+    });
+
+    var DummyPollApi = Stubs.extend(function(self) {
+        self = Stubs.call(self, DummyPollApi);
+
+        self.responses = {};
+        self.responses.submit = new Stub('ureporters.poll.responses.submit');
+
+        self.summary = new Stub('ureporters.poll.summary');
+
+        return self;
+    });
 
     return {
         DummyUReportApi: DummyUReportApi,
         DummyUReportersApi: DummyUReportersApi,
         DummyPollApi: DummyPollApi,
-        stub: stub
+        Stubs: Stubs,
+        Stub: Stub
     };
 }();
