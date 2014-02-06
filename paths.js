@@ -16,7 +16,9 @@ src.lib = [].concat(
     src.app,
     src.dummy);
 
-src.demo = [].concat(src.lib, [
+src.demo = [
+    'node_modules/sinon/pkg/sinon.js',
+].concat(src.lib, [
     'src/demo.js'
 ]);
 
