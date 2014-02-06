@@ -2,7 +2,6 @@
   "name": "vumi-ureport",
   "version": "0.0.0",
   "description": "The vumi jsbox application for the U-Report project",
-  "main": "index.js",
   "scripts": {
     "test": "grunt test"
   },
