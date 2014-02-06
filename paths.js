@@ -30,8 +30,8 @@ src.all = [
 module.exports = {
     src: src,
     dest: {
-        prd: 'lib/vumi-ureport.js',
-        demo: 'lib/vumi-ureport.demo.js'
+        prd: 'vumi-ureport.js',
+        demo: 'vumi-ureport.demo.js'
     },
     test: {
         spec: [

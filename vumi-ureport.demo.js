@@ -154,12 +154,12 @@ vumi_ureport.app = function() {
     };
 }();
 
-vumi_ureport.dummy = function() {
+vumi_ureport.fixtures = function() {
     return {
     };
 };
 
-vumi_ureport.fixtures = function() {
+vumi_ureport.dummy = function() {
     return {
     };
 };
