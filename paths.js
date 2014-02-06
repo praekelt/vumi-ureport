@@ -7,8 +7,8 @@ src.app = [
 ];
 
 src.dummy = [
-    'src/dummy.js',
-    'src/fixtures.js'
+    'src/fixtures.js',
+    'src/dummy.js'
 ];
 
 src.lib = [].concat(
