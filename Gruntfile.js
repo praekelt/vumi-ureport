@@ -6,46 +6,31 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.initConfig({
-        paths: {
-            dest: 'lib/vumi-ureport.js',
-            src: {
-                app: paths,
-                init: 'src/init.js'
-            },
-            test: {
-                spec: [
-                    'test/**/*.test.js'
-                ],
-                requires: [
-                    'test/setup.js'
-                ]
-            }
-        },
+        paths: paths,
 
         watch: {
-            app: {
-                files: [
-                    '<%= paths.src.app %>',
-                    '<%= paths.src.init %>'
-                ],
+            src: {
+                files: ['<%= paths.src.all %>'],
                 tasks: ['build']
             }
         },
 
         concat: {
-            app: {
-                src: [
-                    '<%= paths.src.app %>',
-                    '<%= paths.src.init %>'
-                ],
-                dest: '<%= paths.dest %>'
+            prd: {
+                src: ['<%= paths.src.prd %>'],
+                dest: '<%= paths.dest.prd %>'
+            },
+
+            demo: {
+                src: ['<%= paths.src.demo %>'],
+                dest: '<%= paths.dest.demo %>'
             },
         },
 
         mochaTest: {
             test: {
                 src: [
-                    '<%= paths.src.app %>',
+                    '<%= paths.src.lib %>',
                     '<%= paths.test.requires %>',
                     '<%= paths.test.spec %>'
                 ],
