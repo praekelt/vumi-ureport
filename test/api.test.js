@@ -5,44 +5,17 @@ var test_utils = vumigo.test_utils;
 var utils = vumigo.utils;
 
 var UReportApi = vumi_ureport.api.UReportApi;
+var DummyUReportApi = vumi_ureport.dummy.DummyUReportApi;
 
 
 describe("api", function() {
     describe("UReportApi", function() {
+        var api;
         var ureport;
-
-        function add_fixture(opts) {
-            opts.request = utils.set_defaults(opts.request || {}, {
-                content_type: 'application/json; charset=utf-8'
-            });
-
-            opts.response = utils.set_defaults(opts.response || {}, {
-                code: 200
-            });
-
-            if ('data' in opts.request) {
-                opts.request.body = JSON.stringify(opts.request.data);
-            }
-
-            if ('data' in opts.response) {
-                opts.response.body = JSON.stringify(opts.response.data);
-            }
-
-            ureport.im.api.add_http_fixture(opts);
-        }
-
-        function get_request() {
-            var request = ureport.im.api.http_requests[0];
-
-            if (request.body) {
-                request.data = JSON.parse(request.body);
-            }
-
-            return request;
-        }
 
         beforeEach(function() {
             return test_utils.make_im().then(function(im) {
+                api = new DummyUReportApi(im.api, 'http://example.com');
                 ureport = new UReportApi(
                     im,
                     'http://example.com',
@@ -52,13 +25,10 @@ describe("api", function() {
 
         describe(".ureporters.get", function() {
             it("should return the ureporter's data", function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'GET',
-                        url: [
-                            'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
-                        ].join('/')
+                        url: 'ureporters/vumi_go_sms/+256775551122'
                     },
                     response: {
                         data: {
@@ -86,13 +56,10 @@ describe("api", function() {
         describe(".ureporters.is_registered", function() {
             it("should return true if the ureporter is registered",
             function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'GET',
-                        url: [
-                            'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
-                        ].join('/')
+                        url: 'ureporters/vumi_go_sms/+256775551122'
                     },
                     response: {
                         data: {
@@ -115,13 +82,10 @@ describe("api", function() {
 
             it("should return false if the ureporter is not registered",
             function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'GET',
-                        url: [
-                            'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
-                        ].join('/')
+                        url: 'ureporters/vumi_go_sms/+256775551122'
                     },
                     response: {
                         data: {
@@ -144,13 +108,10 @@ describe("api", function() {
 
             it("should return false if the ureporter is not found",
             function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'GET',
-                        url: [
-                            'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
-                        ].join('/')
+                        url: 'ureporters/vumi_go_sms/+256775551122'
                     },
                     response: {code: 404}
                 });
@@ -166,11 +127,10 @@ describe("api", function() {
 
         describe(".ureporters.polls.current", function() {
             it("should the return current poll", function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'GET',
                         url: [
-                            'http://example.com',
                             'ureporters/vumi_go_sms/+256775551122',
                             'polls/current'
                         ].join('/')
@@ -194,11 +154,10 @@ describe("api", function() {
 
         describe(".ureporters.polls.topics", function() {
             it("should the return current topics", function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'GET',
                         url: [
-                            'http://example.com',
                             'ureporters/vumi_go_sms/+256775551122',
                             'polls/topics'
                         ].join('/')
@@ -222,11 +181,10 @@ describe("api", function() {
 
         describe(".ureporters.poll.responses.submit", function() {
             beforeEach(function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'POST',
                         url: [
-                            'http://example.com',
                             'ureporters/vumi_go_sms/+256775551122',
                             'poll/1234/responses/'
                         ].join('/'),
@@ -250,7 +208,7 @@ describe("api", function() {
                     .poll('1234')
                     .responses.submit('response text')
                     .then(function() {
-                        var request = get_request();
+                        var request = api.last_request();
 
                         assert.deepEqual(
                             request.data,
@@ -274,11 +232,10 @@ describe("api", function() {
 
         describe(".ureporters.poll.summary", function() {
             it("should return the poll summary", function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'GET',
                         url: [
-                            'http://example.com',
                             'ureporters/vumi_go_sms/+256775551122',
                             'poll/1234/summary'
                         ].join('/')
@@ -303,11 +260,10 @@ describe("api", function() {
 
         describe(".ureporters.reports.submit", function() {
             beforeEach(function() {
-                add_fixture({
+                api.add_fixture({
                     request: {
                         method: 'POST',
                         url: [
-                            'http://example.com',
                             'ureporters/vumi_go_sms/+256775551122',
                             'reports/'
                         ].join('/'),
@@ -330,7 +286,7 @@ describe("api", function() {
                     .ureporters('+256775551122')
                     .reports.submit('report text')
                     .then(function() {
-                        var request = get_request();
+                        var request = api.last_request();
 
                         assert.deepEqual(
                             request.data,
