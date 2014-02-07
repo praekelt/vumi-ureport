@@ -4876,6 +4876,11 @@ vumi_ureport.app = function() {
     };
 }();
 
+vumi_ureport.fixtures = function() {
+    return {
+    };
+};
+
 var Q = require('q');
 var sinon = require('sinon');
 
@@ -4956,11 +4961,6 @@ vumi_ureport.dummy = function() {
         Stub: Stub
     };
 }();
-
-vumi_ureport.fixtures = function() {
-    return {
-    };
-};
 
 vumi_ureport.demo = function() {
     return {
