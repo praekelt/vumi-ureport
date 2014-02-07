@@ -39,15 +39,7 @@ vumi_ureport.app = function() {
             });
         };
 
-        self.set_poll_id = function(poll_id) {
-            self.user.metadata.poll_id = poll_id;
-        };
-
-        self.set_response = function(response) {
-            self.user.metadata.response = response;
-        };
-
-        self.show_poll = function(state_name, opts) {
+        self.show_poll = function(name, opts) {
             return self.ureporter.polls.current().then(function(poll) {
                 opts = utils.set_defaults(opts || {}, {
                     question: poll.question,
@@ -61,8 +53,7 @@ vumi_ureport.app = function() {
                         .responses.submit(content)
                         .then(function(result) {
                             if (result.accepted) {
-                                self.set_response(result.response);
-                                return next(content);
+                                return next(content, poll, result);
                             }
                             else {
                                 // TODO what do do here?
@@ -71,8 +62,7 @@ vumi_ureport.app = function() {
                         });
                 };
 
-                self.set_poll_id(poll.id);
-                return new FreeText(state_name, opts);
+                return new FreeText(name, opts);
             });
         };
 
@@ -91,7 +81,7 @@ vumi_ureport.app = function() {
                 : self.states.create('states:register');
         });
 
-        self.states.add('states:register', function(state_name) {
+        self.states.add('states:register', function(name) {
             function next(content) {
                 return self
                     .refresh_user()
@@ -102,12 +92,12 @@ vumi_ureport.app = function() {
                     });
             }
 
-            return self.show_poll(state_name, {next: next});
+            return self.show_poll(name, {next: next});
         });
 
         // TODO what to put as question?
-        self.states.add('states:main_menu', function(state_name) {
-            return new ChoiceState(state_name, {
+        self.states.add('states:main_menu', function(name) {
+            return new ChoiceState(name, {
                 question: "Welcome!",
                 choices: [
                     new Choice('poll', 'Take the Poll'),
@@ -124,15 +114,22 @@ vumi_ureport.app = function() {
             });
         });
 
-        self.states.add('states:poll:question', function(state_name) {
-            return self.show_poll(state_name, {next: 'after_question'});
+        self.states.add('states:poll:question', function(name) {
+            return self.show_poll(name, {
+                next: function(next, poll, result) {
+                    return {
+                        name: 'states:after_question',
+                        metadata: {response: result.response}
+                    };
+                }
+            });
         });
 
         // TODO what to put as default question?
-        self.states.add('states:poll:after_question', function(state_name) {
-            var response = self.user.metatadata.response;
+        self.states.add('states:poll:after_question', function(name) {
+            var response = self.user.state.metadata.response;
 
-            return new ChoiceState(state_name, {
+            return new ChoiceState(name, {
                 question: response || [
                     "Thank you for submitting.",
                     "Would you like to view poll results?"].join(' '),
@@ -148,9 +145,9 @@ vumi_ureport.app = function() {
             });
         });
 
-        self.states.add('states:results:choose', function(state_name) {
+        self.states.add('states:results:choose', function(name) {
             return self.ureporter.polls.topics().then(function(topics) {
-                return new ChoiceState(state_name, {
+                return new ChoiceState(name, {
                     question: [
                         "Thank you for submitting.",
                         "Would you like to view poll results?"].join(' '),
@@ -158,25 +155,29 @@ vumi_ureport.app = function() {
                         return new Choice(topic.poll_id, topic.label);
                     }),
                     next: function(choice) {
-                        self.set_poll_id(choice.value);
-                        return 'states:results:view';
+                        return {
+                            name: 'states:results:view',
+                            opts: {poll_id: choice.value}
+                        };
                     }
                 });
             });
         });
 
-        self.states.add('states:results:view', function(state_name) {
-            var id = self.user.metadata.poll_id;
-            return self.ureporter.poll(id).summary().then(function(summary) {
-                return new EndState(state_name, {
-                    text: self.format_summary(summary),
-                    next: 'states:start'
-                });
+        self.states.add('states:results:view', function(name, opts) {
+            return self
+                .ureporter.poll(opts.poll_id)
+                .summary()
+                .then(function(summary) {
+                    return new EndState(name, {
+                        text: self.format_summary(summary),
+                        next: 'states:start'
+                    });
             });
         });
 
-        self.states.add('states:reports:submit', function(state_name) {
-            return new FreeText(state_name, {
+        self.states.add('states:reports:submit', function(name) {
+            return new FreeText(name, {
                 question: "Please enter your report",
                 next: function(content) {
                     return self
@@ -195,24 +196,25 @@ vumi_ureport.app = function() {
         });
 
         // TODO what to put as default response
-        self.states.add('states:reports:after_submit', function(state_name) {
-            var response = self.user.metadata.response;
+        self.states.add('states:reports:after_submit', function(name, opts) {
+            utils.set_defaults(opts, {
+                response: "Thank you, we've received your report."
+            });
 
-            return new EndState(state_name, {
-                text: response || "Thank you, we've received your report.",
+            return new EndState(name, {
+                text: opts.response,
                 next: 'states:start'
             });
         });
 
         // TODO what to put as default end response
-        self.states.add('states:end', function(state_name) {
-            return new EndState(state_name, {
+        self.states.add('states:end', function(name) {
+            return new EndState(name, {
                 text: "Thank you for using U-Report, goodbye.",
                 next: 'states:start'
             });
         });
     });
-
 
     return {
         VumiUReportApp: VumiUReportApp
