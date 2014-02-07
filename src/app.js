@@ -8,7 +8,7 @@ vumi_ureport.app = function() {
     var UReportApi = vumi_ureport.api.UReportApi;
 
     var VumiUReportApp = App.extend(function(self, opts) {
-        App.call(self, 'states:initial');
+        App.call(self, 'states:start');
 
         utils.set_defaults(opts || {}, {UReportApi: UReportApi});
         self.UReportApi = UReportApi;
@@ -85,7 +85,7 @@ vumi_ureport.app = function() {
             return parts.join('\n');
         };
 
-        self.states.add('states:initial', function() {
+        self.states.add('states:start', function() {
             return self.user.metadata.registered
                 ? self.states.create('states:main_menu')
                 : self.states.create('states:register');
