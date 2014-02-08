@@ -21,49 +21,35 @@ vumi_ureport.app = function() {
             self.config = self.im.config;
             self.ureport = new self.UReportApi(self.im, url, backend);
             self.ureporter = self.ureport.ureporters(self.user.addr);
-
-            self.im.on('session:new', function() {
-                return self.refresh_user();
-            });
         };
 
-        self.refresh_user = function() {
-            return self.ureporter.get().then(function(user) {
-                if (!user) {
-                    self.user.update_metadata({registered: false});
-                    return;
-                } else {
-                    self.user.update_metadata({registered: user.registered});
-                    return self.user.set_lang(user.language);
-                }
-            });
-        };
-
-        self.show_poll = function(name, opts) {
-            return self.ureporter.polls.current().then(function(poll) {
-                opts = utils.set_defaults(opts || {}, {
-                    question: poll.question,
-                    next: utils.noop
+        self.submit_poll_response = function(poll_id, content) {
+            return self
+                .ureporter.poll(poll_id)
+                .responses.submit(content)
+                .then(function(result) {
+                    if (result.accepted) {
+                        return result.response;
+                    }
+                    else {
+                        // TODO throw an error here?
+                        return;
+                    }
                 });
+        };
 
-                var next = opts.next;
-                opts.next = function(content) {
-                    return self
-                        .ureporter.poll(poll.id)
-                        .responses.submit(content)
-                        .then(function(result) {
-                            if (result.accepted) {
-                                return next(content, poll, result);
-                            }
-                            else {
-                                // TODO what do do here?
-                                return;
-                            }
-                        });
-                };
-
-                return new FreeText(name, opts);
-            });
+        self.submit_report = function(content) {
+            return self
+                .ureporter.reports.submit(content)
+                .then(function(result) {
+                    if (result.accepted) {
+                        return result.response;
+                    }
+                    else {
+                        // TODO throw an error here?
+                        return;
+                    }
+                });
         };
 
         self.format_summary = function(data) {
@@ -76,23 +62,32 @@ vumi_ureport.app = function() {
         };
 
         self.states.add('states:start', function() {
-            return self.user.metadata.registered
-                ? self.states.create('states:main_menu')
-                : self.states.create('states:register');
+            return self.ureporter.get().then(function(user) {
+                var p = Q();
+                if (user) {
+                    p = self.user.set_lang(user.language);
+                }
+
+                return p.then(function() {
+                    return self.user.registered
+                        ? self.states.create('states:main_menu')
+                        : self.states.create('states:register');
+                });
+            });
         });
 
+        // TODO what to do with submission response?
         self.states.add('states:register', function(name) {
-            function next(content) {
-                return self
-                    .refresh_user()
-                    .then(function() {
-                        return self.user.metadata.registered
-                            ? 'states:main_menu'
-                            : 'states:register';
-                    });
-            }
-
-            return self.show_poll(name, {next: next});
+            return self.ureporter.polls.current().then(function(poll) {
+                return new FreeText(name, {
+                    question: poll.question,
+                    next: function(content) {
+                        return self
+                            .submit_poll_response(content)
+                            .thenResolve('states:start');
+                    }
+                });
+            });
         });
 
         // TODO what to put as question?
@@ -115,24 +110,34 @@ vumi_ureport.app = function() {
         });
 
         self.states.add('states:poll:question', function(name) {
-            return self.show_poll(name, {
-                next: function(next, poll, result) {
-                    return {
-                        name: 'states:after_question',
-                        metadata: {response: result.response}
-                    };
-                }
+            return self.ureporter.polls.current().then(function(poll) {
+                return new FreeText(name, {
+                    question: poll.question,
+                    next: function(content) {
+                        return self
+                            .submit_poll_response(poll.id, content)
+                            .then(function(response) {
+                                return {
+                                    name: 'states:after_question',
+                                    creator_opts: {response: response}
+                                };
+                            });
+                    }
+                });
             });
         });
 
         // TODO what to put as default question?
-        self.states.add('states:poll:after_question', function(name) {
-            var response = self.user.state.metadata.response;
+        self.states.add('states:poll:after_question', function(name, opts) {
+            utils.set_defaults(opts, {
+                response: [
+                    "Thank you for submitting.",
+                    "Would you like to view poll results?"
+                ].join(' ')
+            });
 
             return new ChoiceState(name, {
-                question: response || [
-                    "Thank you for submitting.",
-                    "Would you like to view poll results?"].join(' '),
+                question: opts.response,
                 choices: [
                     new Choice('yes', 'Yes'),
                     new Choice('no', 'No')],
@@ -145,21 +150,16 @@ vumi_ureport.app = function() {
             });
         });
 
+        // TODO what to put as default question?
         self.states.add('states:results:choose', function(name) {
             return self.ureporter.polls.topics().then(function(topics) {
                 return new ChoiceState(name, {
-                    question: [
-                        "Thank you for submitting.",
-                        "Would you like to view poll results?"].join(' '),
+                    question: (
+                        "Which topics would you like to see results for?"),
                     choices: topics.map(function(topic) {
                         return new Choice(topic.poll_id, topic.label);
                     }),
-                    next: function(choice) {
-                        return {
-                            name: 'states:results:view',
-                            opts: {poll_id: choice.value}
-                        };
-                    }
+                    next: 'states:results:view'
                 });
             });
         });
@@ -181,15 +181,12 @@ vumi_ureport.app = function() {
                 question: "Please enter your report",
                 next: function(content) {
                     return self
-                        .ureporter.reports.submit(content)
-                        .then(function(result) {
-                            if (!result.accepted) {
-                                // TODO what to do here
-                            }
-                            else {
-                                self.set_response(results.response);
-                                return 'states:reports:after_submit';
-                            }
+                        .submit_report(content)
+                        .then(function(response) {
+                            return {
+                                name: 'states:reports:after_submit',
+                                creator_opts: {response: response}
+                            };
                         });
                 }
             });
