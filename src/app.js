@@ -119,7 +119,10 @@ vumi_ureport.app = function() {
                             .then(function(response) {
                                 return {
                                     name: 'states:after_question',
-                                    creator_opts: {response: response}
+                                    creator_opts: {
+                                        poll_id: poll.id,
+                                        response: response
+                                    }
                                 };
                             });
                     }
@@ -142,10 +145,15 @@ vumi_ureport.app = function() {
                     new Choice('yes', 'Yes'),
                     new Choice('no', 'No')],
                 next: function(choice) {
-                    return {
-                        yes: 'states:results:view',
-                        no: 'states:end',
-                    }[choice.value];
+                    if (choice.no) {
+                        return 'states:end';
+                    }
+                    else if (choice.yes) {
+                        return {
+                            name: 'states:results:view',
+                            creator_opts: {poll_id: opts.poll_id}
+                        };
+                    }
                 }
             });
         });
@@ -159,7 +167,12 @@ vumi_ureport.app = function() {
                     choices: topics.map(function(topic) {
                         return new Choice(topic.poll_id, topic.label);
                     }),
-                    next: 'states:results:view'
+                    next: function(choice) {
+                        return {
+                            name: 'states:results:view',
+                            creator_opts: {poll_id: choice.value}
+                        };
+                    }
                 });
             });
         });
