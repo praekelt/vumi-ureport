@@ -1,4 +1,5 @@
-var assert = require("assert");
+var _ = require('underscore');
+var assert = require('assert');
 
 var vumigo = require('vumigo_v02');
 var test_utils = vumigo.test_utils;
@@ -12,11 +13,11 @@ describe("api", function() {
         var ureport;
 
         function add_fixture(ureport, opts) {
-            opts.request = utils.set_defaults(opts.request || {}, {
+            opts.request = _(opts.request || {}).defaults({
                 content_type: 'application/json; charset=utf-8'
             });
 
-            opts.response = utils.set_defaults(opts.response || {}, {
+            opts.response = _(opts.response || {}).defaults({
                 code: 200
             });
 
