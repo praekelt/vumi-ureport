@@ -21,7 +21,8 @@
   "homepage": "https://github.com/praekelt/vumi-ureport",
   "dependencies": {
     "vumigo_v02": "~0.2",
-    "q": "~0.9"
+    "q": "~0.9",
+    "sinon": "~1.8.1"
   },
   "devDependencies": {
     "mocha-as-promised": "~2.0.0",

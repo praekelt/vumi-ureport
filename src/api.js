@@ -6,10 +6,12 @@ vumi_ureport.api = function() {
     var JsonApi = vumigo.http_api.JsonApi;
     var HttpResponseError = vumigo.http_api.HttpResponseError;
 
-    var UReportApi = Extendable.extend(function(self, im, base_url, backend) {
+    var UReportApi = Extendable.extend(function(self, im, url, backend, opts) {
+        opts = opts || {};
+
         self.im = im;
-        self.http = new JsonApi(im);
-        self.base_url = base_url;
+        self.http = new JsonApi(im, {auth: opts.auth});
+        self.base_url = url;
         self.backend = backend;
 
         self.url = function(path) {
@@ -34,14 +36,8 @@ vumi_ureport.api = function() {
             return self
                 .api.http.get(self.url())
                 .get('data')
-                .get('user');
-        };
-
-        self.is_registered = function() {
-            return self
-                .get()
-                .get('registered')
-                .catch(catch_code(404, false));
+                .get('user')
+                .catch(catch_code(404, null));
         };
 
         self.polls = {};
