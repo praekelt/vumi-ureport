@@ -16,7 +16,7 @@ describe("VumiUreport", function() {
         it("should say hello", function() {
             return tester
                 .start()
-                .check.state('initial_state')
+                .check.user.state('initial_state')
                 .check.reply('Hello :)')
                 .run();
         });

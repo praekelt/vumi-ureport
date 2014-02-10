@@ -4758,14 +4758,8 @@ vumi_ureport.api = function() {
             return self
                 .api.http.get(self.url())
                 .get('data')
-                .get('user');
-        };
-
-        self.is_registered = function() {
-            return self
-                .get()
-                .get('registered')
-                .catch(catch_code(404, false));
+                .get('user')
+                .catch(catch_code(404, null));
         };
 
         self.polls = {};

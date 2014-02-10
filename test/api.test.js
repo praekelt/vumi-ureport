@@ -121,69 +121,8 @@ describe("api", function() {
                         });
                     });
             });
-        });
 
-        describe(".ureporters.is_registered", function() {
-            it("should return true if the ureporter is registered",
-            function() {
-                add_fixture(ureport, {
-                    request: {
-                        method: 'GET',
-                        url: [
-                            'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
-                        ].join('/')
-                    },
-                    response: {
-                        data: {
-                            success: true,
-                            user: {
-                                registered: true,
-                                language: 'sw'
-                            }
-                        }
-                    }
-                });
-
-                return ureport
-                    .ureporters('+256775551122')
-                    .is_registered()
-                    .then(function(registered) {
-                        assert(registered);
-                    });
-            });
-
-            it("should return false if the ureporter is not registered",
-            function() {
-                add_fixture(ureport, {
-                    request: {
-                        method: 'GET',
-                        url: [
-                            'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
-                        ].join('/')
-                    },
-                    response: {
-                        data: {
-                            success: true,
-                            user: {
-                                registered: false,
-                                language: 'sw'
-                            }
-                        }
-                    }
-                });
-
-                return ureport
-                    .ureporters('+256775551122')
-                    .is_registered()
-                    .then(function(registered) {
-                        assert(!registered);
-                    });
-            });
-
-            it("should return false if the ureporter is not found",
-            function() {
+            it("should return null if the ureporter is not found", function() {
                 add_fixture(ureport, {
                     request: {
                         method: 'GET',
@@ -197,9 +136,9 @@ describe("api", function() {
 
                 return ureport
                     .ureporters('+256775551122')
-                    .is_registered()
-                    .then(function(registered) {
-                        assert(!registered);
+                    .get()
+                    .then(function(user) {
+                        assert.strictEqual(user, null);
                     });
             });
         });
