@@ -81,6 +81,26 @@ describe("api", function() {
                         });
                     });
             });
+
+            it("should return null if the ureporter is not found", function() {
+                add_fixture({
+                    request: {
+                        method: 'GET',
+                        url: [
+                            'http://example.com',
+                            'ureporters/vumi_go_sms/+256775551122'
+                        ].join('/')
+                    },
+                    response: {code: 404}
+                });
+
+                return ureport
+                    .ureporters('+256775551122')
+                    .get()
+                    .then(function(user) {
+                        assert.strictEqual(user, null);
+                    });
+            });
         });
 
         describe(".ureporters.is_registered", function() {
