@@ -38,15 +38,6 @@ vumi_ureport.api = function() {
                 .catch(catch_code(404, null));
         };
 
-        self.is_registered = function() {
-            return self
-                .api.http.get(self.url())
-                .get('data')
-                .get('user')
-                .get('registered')
-                .catch(catch_code(404, false));
-        };
-
         self.polls = {};
 
         self.polls.current = function() {
