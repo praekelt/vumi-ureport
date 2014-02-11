@@ -166,17 +166,16 @@ vumi_ureport.app = function() {
         self.states.add('states:results:choose', function(name) {
             return self.ureporter.polls.topics().then(function(topics) {
                 return new ChoiceState(name, {
-                    question: (
-                        "Choose poll:"),
-                        choices: topics.map(function(topic) {
-                            return new Choice(topic.poll_id, topic.label);
-                        }),
-                        next: function(choice) {
-                            return {
-                                name: 'states:results:view',
-                                creator_opts: {poll_id: choice.value}
-                            };
-                        }
+                    question: "Choose poll:",
+                    choices: topics.map(function(topic) {
+                        return new Choice(topic.poll_id, topic.label);
+                    }),
+                    next: function(choice) {
+                        return {
+                            name: 'states:results:view',
+                            creator_opts: {poll_id: choice.value}
+                        };
+                    }
                 });
             });
         });
