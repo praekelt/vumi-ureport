@@ -58,7 +58,7 @@ vumi_ureport.app = function() {
         self.format_summary = function(data) {
             var parts = [];
             parts.push(['Total responses', data.total_responses].join(': '));
-            data.responses.each(function(response) {
+            data.responses.forEach(function(response) {
                 parts.push([response.label, response.count].join(': '));
             });
             return parts.join('\n');
@@ -86,7 +86,7 @@ vumi_ureport.app = function() {
                     question: poll.question,
                     next: function(content) {
                         return self
-                            .submit_poll_response(content)
+                            .submit_poll_response(poll.id, content)
                             .thenResolve('states:start');
                     }
                 });
@@ -105,7 +105,7 @@ vumi_ureport.app = function() {
                 next: function(choice) {
                     return {
                         poll: 'states:poll:question',
-                        results: 'states:results:view',
+                        results: 'states:results:choose',
                         reports: 'states:reports:submit'
                     }[choice.value];
                 }
@@ -121,7 +121,7 @@ vumi_ureport.app = function() {
                             .submit_poll_response(poll.id, content)
                             .then(function(response) {
                                 return {
-                                    name: 'states:after_question',
+                                    name: 'states:poll:after_question',
                                     creator_opts: {
                                         poll_id: poll.id,
                                         response: response
@@ -135,12 +135,10 @@ vumi_ureport.app = function() {
 
         // TODO what to put as default question?
         self.states.add('states:poll:after_question', function(name, opts) {
-            utils.set_defaults(opts, {
-                response: [
-                    "Thank you for your response.",
-                    "Would you like to see the results so far?"
-                ].join(' ')
-            });
+            opts.response = opts.response || [
+                "Thank you for your response.",
+                "View the results so far?"
+            ].join(' ');
 
             return new ChoiceState(name, {
                 question: opts.response,
@@ -148,10 +146,10 @@ vumi_ureport.app = function() {
                     new Choice('yes', 'Yes'),
                     new Choice('no', 'No')],
                 next: function(choice) {
-                    if (choice.no) {
+                    if (choice.value == 'no') {
                         return 'states:end';
                     }
-                    else if (choice.yes) {
+                    else if (choice.value == 'yes') {
                         return {
                             name: 'states:results:view',
                             creator_opts: {poll_id: opts.poll_id}
@@ -166,7 +164,7 @@ vumi_ureport.app = function() {
             return self.ureporter.polls.topics().then(function(topics) {
                 return new ChoiceState(name, {
                     question: (
-                        "Which topics would you like to see results for?"),
+                        "Choose poll:"),
                     choices: topics.map(function(topic) {
                         return new Choice(topic.poll_id, topic.label);
                     }),
@@ -194,7 +192,7 @@ vumi_ureport.app = function() {
 
         self.states.add('states:reports:submit', function(name) {
             return new FreeText(name, {
-                question: "Enter Message:",
+                question: "Enter message:",
                 next: function(content) {
                     return self
                         .submit_report(content)
@@ -210,9 +208,7 @@ vumi_ureport.app = function() {
 
         // TODO what to put as default response
         self.states.add('states:reports:after_submit', function(name, opts) {
-            utils.set_defaults(opts, {
-                response: "Thank you for your msg."
-            });
+            opts.response = opts.response || "Thank you for your msg.";
 
             return new EndState(name, {
                 text: opts.response,
