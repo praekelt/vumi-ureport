@@ -28,8 +28,14 @@ describe("app", function() {
             tester
                 .setup.config({
                     name: 'test_ureport',
-                    ureport_api_url: 'http://example.com',
-                    ureport_backend: 'vumi_go_test'
+                    ureport_api: {
+                        url: 'http://example.com',
+                        backend: 'vumi_go_test',
+                        auth: {
+                            username: 'root',
+                            password: 'toor'
+                        }
+                    }
                 })
                 .setup.user({addr: 'user_default'})
                 .setup(function() {

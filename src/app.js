@@ -17,42 +17,45 @@ vumi_ureport.app = function() {
         self.UReportApi = UReportApi;
 
         self.init = function() {
-            var url = self.im.config.get('ureport_api_url');
-            var backend = self.im.config.get('ureport_backend');
-
             self.user = self.im.user;
             self.config = self.im.config;
-            self.ureport = new self.UReportApi(self.im, url, backend);
+
+            var api_config = self.im.config.get('ureport_api');
+            self.ureport = new self.UReportApi(
+                self.im,
+                api_config.url,
+                api_config.backend,
+                {auth: api_config.auth});
             self.ureporter = self.ureport.ureporters(self.user.addr);
         };
 
         self.submit_poll_response = function(poll_id, content) {
             return self
-                .ureporter.poll(poll_id)
-                .responses.submit(content)
-                .then(function(result) {
-                    if (result.accepted) {
-                        return result.response;
-                    }
-                    else {
-                        // TODO not sure what to do here?
-                        return;
-                    }
-                });
+            .ureporter.poll(poll_id)
+            .responses.submit(content)
+            .then(function(result) {
+                if (result.accepted) {
+                    return result.response;
+                }
+                else {
+                    // TODO not sure what to do here?
+                    return;
+                }
+            });
         };
 
         self.submit_report = function(content) {
             return self
-                .ureporter.reports.submit(content)
-                .then(function(result) {
-                    if (result.accepted) {
-                        return result.response;
-                    }
-                    else {
-                        // TODO not sure what to do here?
-                        return;
-                    }
-                });
+            .ureporter.reports.submit(content)
+            .then(function(result) {
+                if (result.accepted) {
+                    return result.response;
+                }
+                else {
+                    // TODO not sure what to do here?
+                    return;
+                }
+            });
         };
 
         self.format_summary = function(data) {
@@ -86,8 +89,8 @@ vumi_ureport.app = function() {
                     question: poll.question,
                     next: function(content) {
                         return self
-                            .submit_poll_response(poll.id, content)
-                            .thenResolve('states:start');
+                        .submit_poll_response(poll.id, content)
+                        .thenResolve('states:start');
                     }
                 });
             });
@@ -118,16 +121,16 @@ vumi_ureport.app = function() {
                     question: poll.question,
                     next: function(content) {
                         return self
-                            .submit_poll_response(poll.id, content)
-                            .then(function(response) {
-                                return {
-                                    name: 'states:poll:after_question',
-                                    creator_opts: {
-                                        poll_id: poll.id,
-                                        response: response
-                                    }
-                                };
-                            });
+                        .submit_poll_response(poll.id, content)
+                        .then(function(response) {
+                            return {
+                                name: 'states:poll:after_question',
+                                creator_opts: {
+                                    poll_id: poll.id,
+                                    response: response
+                                }
+                            };
+                        });
                     }
                 });
             });
@@ -145,17 +148,17 @@ vumi_ureport.app = function() {
                 choices: [
                     new Choice('yes', 'Yes'),
                     new Choice('no', 'No')],
-                next: function(choice) {
-                    if (choice.value == 'no') {
-                        return 'states:end';
+                    next: function(choice) {
+                        if (choice.value == 'no') {
+                            return 'states:end';
+                        }
+                        else if (choice.value == 'yes') {
+                            return {
+                                name: 'states:results:view',
+                                creator_opts: {poll_id: opts.poll_id}
+                            };
+                        }
                     }
-                    else if (choice.value == 'yes') {
-                        return {
-                            name: 'states:results:view',
-                            creator_opts: {poll_id: opts.poll_id}
-                        };
-                    }
-                }
             });
         });
 
@@ -165,28 +168,28 @@ vumi_ureport.app = function() {
                 return new ChoiceState(name, {
                     question: (
                         "Choose poll:"),
-                    choices: topics.map(function(topic) {
-                        return new Choice(topic.poll_id, topic.label);
-                    }),
-                    next: function(choice) {
-                        return {
-                            name: 'states:results:view',
-                            creator_opts: {poll_id: choice.value}
-                        };
-                    }
+                        choices: topics.map(function(topic) {
+                            return new Choice(topic.poll_id, topic.label);
+                        }),
+                        next: function(choice) {
+                            return {
+                                name: 'states:results:view',
+                                creator_opts: {poll_id: choice.value}
+                            };
+                        }
                 });
             });
         });
 
         self.states.add('states:results:view', function(name, opts) {
             return self
-                .ureporter.poll(opts.poll_id)
-                .summary()
-                .then(function(summary) {
-                    return new EndState(name, {
-                        text: self.format_summary(summary),
-                        next: 'states:start'
-                    });
+            .ureporter.poll(opts.poll_id)
+            .summary()
+            .then(function(summary) {
+                return new EndState(name, {
+                    text: self.format_summary(summary),
+                    next: 'states:start'
+                });
             });
         });
 
@@ -195,13 +198,13 @@ vumi_ureport.app = function() {
                 question: "Enter message:",
                 next: function(content) {
                     return self
-                        .submit_report(content)
-                        .then(function(response) {
-                            return {
-                                name: 'states:reports:after_submit',
-                                creator_opts: {response: response}
-                            };
-                        });
+                    .submit_report(content)
+                    .then(function(response) {
+                        return {
+                            name: 'states:reports:after_submit',
+                            creator_opts: {response: response}
+                        };
+                    });
                 }
             });
         });
