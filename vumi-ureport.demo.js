@@ -4850,10 +4850,13 @@ vumi_ureport.api = function() {
 }();
 
 vumi_ureport.app = function() {
+    var Q = require('q');
+    var _ = require('underscore');
+
     var vumigo = require('vumigo_v02');
     var App = vumigo.App;
-    var Choice = states.Choice;
-    var ChoiceState = states.ChoiceState;
+    var Choice = vumigo.states.Choice;
+    var ChoiceState = vumigo.states.ChoiceState;
     var FreeText = vumigo.states.FreeText;
     var EndState = vumigo.states.EndState;
     var UReportApi = vumi_ureport.api.UReportApi;
@@ -4861,52 +4864,55 @@ vumi_ureport.app = function() {
     var VumiUReportApp = App.extend(function(self, opts) {
         App.call(self, 'states:start');
 
-        utils.set_defaults(opts || {}, {UReportApi: UReportApi});
+        opts = _(opts || {}).defaults({UReportApi: UReportApi});
         self.UReportApi = UReportApi;
 
         self.init = function() {
-            var url = self.im.config.get('ureport_api_url');
-            var backend = self.im.config.get('ureport_backend');
-
             self.user = self.im.user;
             self.config = self.im.config;
-            self.ureport = new self.UReportApi(self.im, url, backend);
+
+            var api_config = self.im.config.get('ureport_api');
+            self.ureport = new self.UReportApi(
+                self.im,
+                api_config.url,
+                api_config.backend,
+                {auth: api_config.auth});
             self.ureporter = self.ureport.ureporters(self.user.addr);
         };
 
         self.submit_poll_response = function(poll_id, content) {
             return self
-                .ureporter.poll(poll_id)
-                .responses.submit(content)
-                .then(function(result) {
-                    if (result.accepted) {
-                        return result.response;
-                    }
-                    else {
-                        // TODO throw an error here?
-                        return;
-                    }
-                });
+            .ureporter.poll(poll_id)
+            .responses.submit(content)
+            .then(function(result) {
+                if (result.accepted) {
+                    return result.response;
+                }
+                else {
+                    // TODO not sure what to do here?
+                    return;
+                }
+            });
         };
 
         self.submit_report = function(content) {
             return self
-                .ureporter.reports.submit(content)
-                .then(function(result) {
-                    if (result.accepted) {
-                        return result.response;
-                    }
-                    else {
-                        // TODO throw an error here?
-                        return;
-                    }
-                });
+            .ureporter.reports.submit(content)
+            .then(function(result) {
+                if (result.accepted) {
+                    return result.response;
+                }
+                else {
+                    // TODO not sure what to do here?
+                    return;
+                }
+            });
         };
 
         self.format_summary = function(data) {
             var parts = [];
             parts.push(['Total responses', data.total_responses].join(': '));
-            data.responses.each(function(response) {
+            data.responses.forEach(function(response) {
                 parts.push([response.label, response.count].join(': '));
             });
             return parts.join('\n');
@@ -4920,7 +4926,7 @@ vumi_ureport.app = function() {
                 }
 
                 return p.then(function() {
-                    return self.user.registered
+                    return user && user.registered
                         ? self.states.create('states:main_menu')
                         : self.states.create('states:register');
                 });
@@ -4934,8 +4940,8 @@ vumi_ureport.app = function() {
                     question: poll.question,
                     next: function(content) {
                         return self
-                            .submit_poll_response(content)
-                            .thenResolve('states:start');
+                        .submit_poll_response(poll.id, content)
+                        .thenResolve('states:start');
                     }
                 });
             });
@@ -4944,16 +4950,16 @@ vumi_ureport.app = function() {
         // TODO what to put as question?
         self.states.add('states:main_menu', function(name) {
             return new ChoiceState(name, {
-                question: "Welcome!",
+                question: "Ureport (Speak out for your community)",
                 choices: [
-                    new Choice('poll', 'Take the Poll'),
-                    new Choice('results', 'See Results'),
-                    new Choice('reports', 'Submit Report')
+                    new Choice('poll', "This week's question"),
+                    new Choice('results', 'Poll results'),
+                    new Choice('reports', 'Send report')
                 ],
                 next: function(choice) {
                     return {
                         poll: 'states:poll:question',
-                        results: 'states:results:view',
+                        results: 'states:results:choose',
                         reports: 'states:reports:submit'
                     }[choice.value];
                 }
@@ -4966,16 +4972,16 @@ vumi_ureport.app = function() {
                     question: poll.question,
                     next: function(content) {
                         return self
-                            .submit_poll_response(poll.id, content)
-                            .then(function(response) {
-                                return {
-                                    name: 'states:after_question',
-                                    creator_opts: {
-                                        poll_id: poll.id,
-                                        response: response
-                                    }
-                                };
-                            });
+                        .submit_poll_response(poll.id, content)
+                        .then(function(response) {
+                            return {
+                                name: 'states:poll:after_question',
+                                creator_opts: {
+                                    poll_id: poll.id,
+                                    response: response
+                                }
+                            };
+                        });
                     }
                 });
             });
@@ -4983,29 +4989,27 @@ vumi_ureport.app = function() {
 
         // TODO what to put as default question?
         self.states.add('states:poll:after_question', function(name, opts) {
-            utils.set_defaults(opts, {
-                response: [
-                    "Thank you for submitting.",
-                    "Would you like to view poll results?"
-                ].join(' ')
-            });
+            opts.response = opts.response || [
+                "Thank you for your response.",
+                "View the results so far?"
+            ].join(' ');
 
             return new ChoiceState(name, {
                 question: opts.response,
                 choices: [
                     new Choice('yes', 'Yes'),
                     new Choice('no', 'No')],
-                next: function(choice) {
-                    if (choice.no) {
-                        return 'states:end';
+                    next: function(choice) {
+                        if (choice.value == 'no') {
+                            return 'states:end';
+                        }
+                        else if (choice.value == 'yes') {
+                            return {
+                                name: 'states:results:view',
+                                creator_opts: {poll_id: opts.poll_id}
+                            };
+                        }
                     }
-                    else if (choice.yes) {
-                        return {
-                            name: 'states:results:view',
-                            creator_opts: {poll_id: opts.poll_id}
-                        };
-                    }
-                }
             });
         });
 
@@ -5014,53 +5018,51 @@ vumi_ureport.app = function() {
             return self.ureporter.polls.topics().then(function(topics) {
                 return new ChoiceState(name, {
                     question: (
-                        "Which topics would you like to see results for?"),
-                    choices: topics.map(function(topic) {
-                        return new Choice(topic.poll_id, topic.label);
-                    }),
-                    next: function(choice) {
-                        return {
-                            name: 'states:results:view',
-                            creator_opts: {poll_id: choice.value}
-                        };
-                    }
+                        "Choose poll:"),
+                        choices: topics.map(function(topic) {
+                            return new Choice(topic.poll_id, topic.label);
+                        }),
+                        next: function(choice) {
+                            return {
+                                name: 'states:results:view',
+                                creator_opts: {poll_id: choice.value}
+                            };
+                        }
                 });
             });
         });
 
         self.states.add('states:results:view', function(name, opts) {
             return self
-                .ureporter.poll(opts.poll_id)
-                .summary()
-                .then(function(summary) {
-                    return new EndState(name, {
-                        text: self.format_summary(summary),
-                        next: 'states:start'
-                    });
+            .ureporter.poll(opts.poll_id)
+            .summary()
+            .then(function(summary) {
+                return new EndState(name, {
+                    text: self.format_summary(summary),
+                    next: 'states:start'
+                });
             });
         });
 
         self.states.add('states:reports:submit', function(name) {
             return new FreeText(name, {
-                question: "Please enter your report",
+                question: "Enter message:",
                 next: function(content) {
                     return self
-                        .submit_report(content)
-                        .then(function(response) {
-                            return {
-                                name: 'states:reports:after_submit',
-                                creator_opts: {response: response}
-                            };
-                        });
+                    .submit_report(content)
+                    .then(function(response) {
+                        return {
+                            name: 'states:reports:after_submit',
+                            creator_opts: {response: response}
+                        };
+                    });
                 }
             });
         });
 
         // TODO what to put as default response
         self.states.add('states:reports:after_submit', function(name, opts) {
-            utils.set_defaults(opts, {
-                response: "Thank you, we've received your report."
-            });
+            opts.response = opts.response || "Thank you for your msg.";
 
             return new EndState(name, {
                 text: opts.response,
@@ -5071,7 +5073,7 @@ vumi_ureport.app = function() {
         // TODO what to put as default end response
         self.states.add('states:end', function(name) {
             return new EndState(name, {
-                text: "Thank you for using U-Report, goodbye.",
+                text: "Thank you for using Ureport.",
                 next: 'states:start'
             });
         });
