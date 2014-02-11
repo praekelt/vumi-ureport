@@ -1,8 +1,11 @@
 vumi_ureport.app = function() {
+    var Q = require('q');
+    var _ = require('underscore');
+
     var vumigo = require('vumigo_v02');
     var App = vumigo.App;
-    var Choice = states.Choice;
-    var ChoiceState = states.ChoiceState;
+    var Choice = vumigo.states.Choice;
+    var ChoiceState = vumigo.states.ChoiceState;
     var FreeText = vumigo.states.FreeText;
     var EndState = vumigo.states.EndState;
     var UReportApi = vumi_ureport.api.UReportApi;
@@ -10,7 +13,7 @@ vumi_ureport.app = function() {
     var VumiUReportApp = App.extend(function(self, opts) {
         App.call(self, 'states:start');
 
-        utils.set_defaults(opts || {}, {UReportApi: UReportApi});
+        opts = _(opts || {}).defaults({UReportApi: UReportApi});
         self.UReportApi = UReportApi;
 
         self.init = function() {
@@ -32,7 +35,7 @@ vumi_ureport.app = function() {
                         return result.response;
                     }
                     else {
-                        // TODO throw an error here?
+                        // TODO not sure what to do here?
                         return;
                     }
                 });
@@ -46,7 +49,7 @@ vumi_ureport.app = function() {
                         return result.response;
                     }
                     else {
-                        // TODO throw an error here?
+                        // TODO not sure what to do here?
                         return;
                     }
                 });
@@ -69,7 +72,7 @@ vumi_ureport.app = function() {
                 }
 
                 return p.then(function() {
-                    return self.user.registered
+                    return user && user.registered
                         ? self.states.create('states:main_menu')
                         : self.states.create('states:register');
                 });
@@ -93,11 +96,11 @@ vumi_ureport.app = function() {
         // TODO what to put as question?
         self.states.add('states:main_menu', function(name) {
             return new ChoiceState(name, {
-                question: "Welcome!",
+                question: "Ureport (Speak out for your community)",
                 choices: [
-                    new Choice('poll', 'Take the Poll'),
-                    new Choice('results', 'See Results'),
-                    new Choice('reports', 'Submit Report')
+                    new Choice('poll', "This week's question"),
+                    new Choice('results', 'Poll results'),
+                    new Choice('reports', 'Send report')
                 ],
                 next: function(choice) {
                     return {
@@ -134,8 +137,8 @@ vumi_ureport.app = function() {
         self.states.add('states:poll:after_question', function(name, opts) {
             utils.set_defaults(opts, {
                 response: [
-                    "Thank you for submitting.",
-                    "Would you like to view poll results?"
+                    "Thank you for your response.",
+                    "Would you like to see the results so far?"
                 ].join(' ')
             });
 
@@ -191,7 +194,7 @@ vumi_ureport.app = function() {
 
         self.states.add('states:reports:submit', function(name) {
             return new FreeText(name, {
-                question: "Please enter your report",
+                question: "Enter Message:",
                 next: function(content) {
                     return self
                         .submit_report(content)
@@ -208,7 +211,7 @@ vumi_ureport.app = function() {
         // TODO what to put as default response
         self.states.add('states:reports:after_submit', function(name, opts) {
             utils.set_defaults(opts, {
-                response: "Thank you, we've received your report."
+                response: "Thank you for your msg."
             });
 
             return new EndState(name, {
@@ -220,7 +223,7 @@ vumi_ureport.app = function() {
         // TODO what to put as default end response
         self.states.add('states:end', function(name) {
             return new EndState(name, {
-                text: "Thank you for using U-Report, goodbye.",
+                text: "Thank you for using Ureport.",
                 next: 'states:start'
             });
         });
