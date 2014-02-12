@@ -67,10 +67,10 @@ vumi_ureport.app = function() {
         });
 
         self.states.add('states:register:next', function(name, opts) {
-            _(opts).defaults({in_error: false});
+            _(opts).defaults({rejected: false});
 
-            var content = opts.in_error
-                ? self.user.get_answer('states:register:error')
+            var content = opts.rejected
+                ? self.user.get_answer('states:register:rejected')
                 : self.user.get_answer('states:register');
 
             return self
@@ -79,7 +79,7 @@ vumi_ureport.app = function() {
                 .then(function(result) {
                     return result.accepted
                         ? self.states.create('states:start')
-                        : self.states.create('states:register:error', {
+                        : self.states.create('states:register:rejected', {
                             poll_id: opts.poll_id,
                             response: result.response
                         });
@@ -87,7 +87,7 @@ vumi_ureport.app = function() {
         });
 
         // TODO what to put as default 'not accepted' response
-        self.states.add('states:register:error', function(name, opts) {
+        self.states.add('states:register:rejected', function(name, opts) {
             opts.response = opts.response
                          || "Response rejected, please try again.";
 
@@ -96,7 +96,7 @@ vumi_ureport.app = function() {
                 next: {
                     name: 'states:register:next',
                     creator_opts: {
-                        in_error: true,
+                        rejected: true,
                         poll_id: opts.poll_id
                     }
                 }
@@ -135,10 +135,10 @@ vumi_ureport.app = function() {
         });
 
         self.states.add('states:poll:question:next', function(name, opts) {
-            _(opts).defaults({in_error: false});
+            _(opts).defaults({rejected: false});
 
-            var content = opts.in_error
-                ? self.user.get_answer('states:poll:question:error')
+            var content = opts.rejected
+                ? self.user.get_answer('states:poll:question:rejected')
                 : self.user.get_answer('states:poll:question');
 
             return self
@@ -146,11 +146,11 @@ vumi_ureport.app = function() {
                 .responses.submit(content)
                 .then(function(result) {
                     return result.accepted
-                        ? self.states.create('states:poll:question:done', {
+                        ? self.states.create('states:poll:question:accepted', {
                             poll_id: opts.poll_id,
                             response: result.response
                         })
-                        : self.states.create('states:poll:question:error', {
+                        : self.states.create('states:poll:question:rejected', {
                             poll_id: opts.poll_id,
                             response: result.response
                         });
@@ -158,7 +158,7 @@ vumi_ureport.app = function() {
         });
 
         // TODO what to put as default 'not accepted' response
-        self.states.add('states:poll:question:error', function(name, opts) {
+        self.states.add('states:poll:question:rejected', function(name, opts) {
             opts.response = opts.response
                          || "Response rejected, please try again.";
 
@@ -167,7 +167,7 @@ vumi_ureport.app = function() {
                 next: {
                     name: 'states:poll:question:next',
                     creator_opts: {
-                        in_error: true,
+                        rejected: true,
                         poll_id: opts.poll_id
                     }
                 }
@@ -175,7 +175,7 @@ vumi_ureport.app = function() {
         });
 
         // TODO what to put as default question?
-        self.states.add('states:poll:question:done', function(name, opts) {
+        self.states.add('states:poll:question:accepted', function(name, opts) {
             opts.response = opts.response || [
                 "Thank you for your response.",
                 "View the results so far?"
@@ -238,27 +238,27 @@ vumi_ureport.app = function() {
         });
 
         self.states.add('states:reports:submit:next', function(name, opts) {
-            _(opts).defaults({in_error: false});
+            _(opts).defaults({rejected: false});
 
-            var content = opts.in_error
-                ? self.user.get_answer('states:reports:submit:error')
+            var content = opts.rejected
+                ? self.user.get_answer('states:reports:submit:rejected')
                 : self.user.get_answer('states:reports:submit');
 
             return self
                 .ureporter.reports.submit(content)
                 .then(function(result) {
                     return result.accepted
-                        ? self.states.create('states:reports:submit:done', {
+                        ? self.states.create('states:reports:submit:accepted', {
                             response: result.response
                         })
-                        : self.states.create('states:reports:submit:error', {
+                        : self.states.create('states:reports:submit:rejected', {
                             response: result.response
                         });
                 });
         });
 
         // TODO what to put as default 'not accepted' response
-        self.states.add('states:reports:submit:error', function(name, opts) {
+        self.states.add('states:reports:submit:rejected', function(name, opts) {
             opts.response = opts.response
                          || "Response rejected, please try again.";
 
@@ -266,13 +266,13 @@ vumi_ureport.app = function() {
                 question: opts.response,
                 next: {
                     name: 'states:reports:submit:next',
-                    creator_opts: {in_error: true}
+                    creator_opts: {rejected: true}
                 }
             });
         });
 
         // TODO what to put as default response
-        self.states.add('states:reports:submit:done', function(name, opts) {
+        self.states.add('states:reports:submit:accepted', function(name, opts) {
             opts.response = opts.response || "Thank you for your msg.";
 
             return new EndState(name, {
