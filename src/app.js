@@ -88,8 +88,8 @@ vumi_ureport.app = function() {
 
         // TODO what to put as default 'not accepted' response
         self.states.add('states:register:error', function(name, opts) {
-            opts.respones = opts.response
-                         || "Response rejected. Please try again";
+            opts.response = opts.response
+                         || "Response rejected, please try again.";
 
             return new FreeText(name, {
                 question: opts.response,
@@ -159,8 +159,8 @@ vumi_ureport.app = function() {
 
         // TODO what to put as default 'not accepted' response
         self.states.add('states:poll:question:error', function(name, opts) {
-            opts.respones = opts.response
-                         || "Response rejected. Please try again";
+            opts.response = opts.response
+                         || "Response rejected, please try again.";
 
             return new FreeText(name, {
                 question: opts.response,
@@ -251,7 +251,7 @@ vumi_ureport.app = function() {
                         ? self.states.create('states:reports:submit:done', {
                             response: result.response
                         })
-                        : self.states.create('states:reports:error', {
+                        : self.states.create('states:reports:submit:error', {
                             response: result.response
                         });
                 });
@@ -259,8 +259,8 @@ vumi_ureport.app = function() {
 
         // TODO what to put as default 'not accepted' response
         self.states.add('states:reports:submit:error', function(name, opts) {
-            opts.respones = opts.response
-                         || "Response rejected. Please try again";
+            opts.response = opts.response
+                         || "Response rejected, please try again.";
 
             return new FreeText(name, {
                 question: opts.response,
