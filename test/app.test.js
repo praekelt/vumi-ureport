@@ -233,7 +233,7 @@ describe("app", function() {
                 it("should show them results for the poll they are on",
                 function() {
                     return tester
-                        .setup.user.state('states:poll:after_question')
+                        .setup.user.state('states:poll:question:done')
                         .setup.user.state.creator_opts({poll_id: 'poll_1'})
                         .input('1')
                         .check.reply([
@@ -249,7 +249,7 @@ describe("app", function() {
             describe("if they to not view the poll results", function() {
                 it("should show them the end-of-session response", function() {
                     return tester
-                        .setup.user.state('states:poll:after_question')
+                        .setup.user.state('states:poll:question:done')
                         .setup.user.state.creator_opts({poll_id: 'poll_1'})
                         .input('2')
                         .check.reply("Thank you for using Ureport.")
@@ -311,7 +311,7 @@ describe("app", function() {
                     .setup.user.state('states:reports:submit')
                     .input("report text")
                     .check.reply("Thank you for your report.")
-                    .check.user.state('states:reports:after_submit')
+                    .check.user.state('states:reports:submit:done')
                     .run();
             });
 
@@ -321,7 +321,7 @@ describe("app", function() {
                     .setup.user.state('states:reports:submit')
                     .input("report text")
                     .check.reply("Thank you for your msg.")
-                    .check.user.state('states:reports:after_submit')
+                    .check.user.state('states:reports:submit:done')
                     .run();
             });
         });
@@ -329,8 +329,8 @@ describe("app", function() {
         describe("when the user has submitted a report", function() {
             it("should start at the beginning on the next session", function() {
                 return tester
-                    .setup.user.state('states:reports:after_submit')
-                    .input()
+                    .setup.user.state('states:reports:submit:done')
+                    .start()
                     .check.user.state('states:main_menu')
                     .run();
             });
@@ -340,7 +340,7 @@ describe("app", function() {
             it("should start at the beginning on the next session", function() {
                 return tester
                     .setup.user.state('states:end')
-                    .input()
+                    .start()
                     .check.user.state('states:main_menu')
                     .run();
             });
