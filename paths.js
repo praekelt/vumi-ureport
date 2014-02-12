@@ -7,7 +7,6 @@ src.app = [
 ];
 
 src.dummy = [
-    'src/fixtures.js',
     'src/dummy.js'
 ];
 
