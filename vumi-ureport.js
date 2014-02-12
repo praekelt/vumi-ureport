@@ -142,15 +142,15 @@ vumi_ureport.app = function() {
     var VumiUReportApp = App.extend(function(self, opts) {
         App.call(self, 'states:start');
 
-        opts = _(opts || {}).defaults({UReportApi: UReportApi});
-        self.UReportApi = UReportApi;
+        opts = _(opts || {}).defaults({ureport: null});
+        self.ureport = opts.ureport;
 
         self.init = function() {
             self.user = self.im.user;
             self.config = self.im.config;
 
             var api_config = self.im.config.get('ureport_api');
-            self.ureport = new self.UReportApi(
+            self.ureport = self.ureport || new UReportApi(
                 self.im,
                 api_config.url,
                 api_config.backend,
