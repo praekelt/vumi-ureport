@@ -24,8 +24,8 @@ vumi_ureport.dummy = function() {
             return self.parse(result);
         };
 
-        self.result;
         self.type = type;
+        self.result = null;
         self.subordinates = [];
 
         self.parse = function(result) {
