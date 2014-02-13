@@ -1,3 +1,5 @@
+global.vumi_ureport = {};
+
 var path = require('path');
 require('mocha-as-promised')();
 

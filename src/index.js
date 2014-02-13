@@ -1,1 +1,1 @@
-var vumi_ureport = global.vumi_ureport = {};
+var vumi_ureport = {};
