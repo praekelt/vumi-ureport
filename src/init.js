@@ -5,6 +5,6 @@ vumi_ureport.init = function() {
 
 
     return {
-        im: new InteractionMachine(global.api, new VumiUReportApp())
+        im: new InteractionMachine(api, new VumiUReportApp())
     };
 }();
