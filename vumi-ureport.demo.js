@@ -541,7 +541,7 @@ vumi_ureport.demo = function() {
 
     var ureport = new DummyUReportApi();
     var app = new VumiUReportApp({ureport: ureport});
-    var im = new InteractionMachine(global.api, app);
+    var im = new InteractionMachine(api, app);
 
     ureport
         .ureporters
