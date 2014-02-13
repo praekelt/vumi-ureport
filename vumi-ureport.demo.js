@@ -556,7 +556,7 @@ vumi_ureport.demo = function() {
         .current.returns({
             id: "poll_agriculture",
             language: "en",
-            name: "Aggriculture",
+            name: "Agriculture",
             question: [
                 "What are the biggest challenges to farming?",
                 "1. Capital",
@@ -585,27 +585,33 @@ vumi_ureport.demo = function() {
             label: "Education "
         }]);
 
-    ureport
+    var poll_agriculture = ureport
         .ureporters
         .poll.when(function(poll_id) {
             return poll_id === "poll_agriculture";
-        })
-        .summary.returns({
-            total_responses: 5756,
-            responses: [ {
-                label: "Capital",
-                count: 1234
-            }, {
-                label: "Lack of land",
-                count: 2522
-            }, {
-                label: "Chemicals",
-                count: 432
-            }, {
-                label: "Market prices",
-                count: 223
-            }]
         });
+
+    poll_agriculture.summary.returns({
+        total_responses: 5756,
+        responses: [ {
+            label: "Capital",
+            count: 1234
+        }, {
+            label: "Lack of land",
+            count: 2522
+        }, {
+            label: "Chemicals",
+            count: 432
+        }, {
+            label: "Market prices",
+            count: 223
+        }]
+    });
+
+    poll_agriculture.responses.submit.returns({
+        accepted: true,
+        response: null
+    });
 
     ureport
         .ureporters
@@ -621,16 +627,6 @@ vumi_ureport.demo = function() {
                 label: "Infrastructure",
                 count: 1234
             }]
-        });
-
-    ureport
-        .ureporters
-        .poll.when(function(poll_id) {
-            return poll_id === "poll_agriculture";
-        })
-        .responses.submit.returns({
-            accepted: true,
-            response: null
         });
 
     ureport
