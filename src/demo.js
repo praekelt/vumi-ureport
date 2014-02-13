@@ -21,7 +21,7 @@ vumi_ureport.demo = function() {
         .current.returns({
             id: "poll_agriculture",
             language: "en",
-            name: "Aggriculture",
+            name: "Agriculture",
             question: [
                 "What are the biggest challenges to farming?",
                 "1. Capital",
