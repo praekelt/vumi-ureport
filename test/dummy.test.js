@@ -1,8 +1,6 @@
 var Q = require('q');
-var sinon = require('sinon');
 var assert = require('assert');
 
-var dummy = vumi_ureport.dummy;
 var DummyUReportApi = vumi_ureport.dummy.DummyUReportApi;
 var Stub = vumi_ureport.dummy.Stub;
 var Stubs = vumi_ureport.dummy.Stubs;
@@ -10,59 +8,97 @@ var Stubs = vumi_ureport.dummy.Stubs;
 
 describe("dummy", function() {
     describe("Stub", function() {
-        it("should always return a promise", function() {
-            var s = new Stub('some.stub');
-            s.returns('foo');
-            s.withArgs('a').returns('bar');
-            s.withArgs('b').returns('baz');
-            assert(Q.isPromise(s()));
-            assert(Q.isPromise(s('a')));
-            assert(Q.isPromise(s('b')));
+        it("should throw an error if no return value is provided", function() {
+            var stub = new Stub();
+            return stub().catch(function(e) {
+                assert.equal(e.message, "No return value provided for stub");
+            });
+        });
+        
+        describe(".returns", function() {
+            it("should change the stub's return value", function() {
+                var stub = new Stub();
+                var values = [];
+
+                stub.returns('foo');
+                values.push(stub());
+
+                stub.returns('bar');
+                values.push(stub());
+
+                return Q.all(values).then(function(values) {
+                    assert.deepEqual(values, ['foo', 'bar']);
+                });
+            });
         });
 
-        it("should throw an error if no return value is provided", function() {
-            var s = new Stub('some.stub');
-            return s().catch(function(e) {
-                assert.equal(
-                    e.message,
-                    "No return value provided for 'some.stub'");
+        describe("when the stub is called", function() {
+            it("should use the first predicate that matches the call args",
+            function() {
+                var stub = new Stub();
+
+                stub
+                    .when(function(arg) { return arg === 'a'; })
+                    .returns('foo');
+
+                stub
+                    .when(function(arg) { return arg === 'b'; })
+                    .returns('bar');
+
+                stub
+                    .when(function(arg) { return arg === 'b'; })
+                    .returns('baz');
+
+                return stub('b').then(function(result) {
+                    assert.equal(result, 'bar');
+                });
+            });
+
+            it("should fall back to its own return value", function() {
+                var stub = new Stub();
+
+                stub.returns('qux');
+
+                stub
+                    .when(function(arg) { return arg === 'a'; })
+                    .returns('foo');
+
+                return stub('d').then(function(result) {
+                    assert.equal(result, 'qux');
+                });
             });
         });
     });
 
     describe("Stubs", function() {
-        var Things = Stubs.extend(function(self) {
-            self = Stubs.call(self, Things);
-            self.thing = new Stub('thing');
+        var Things = Stubs.extend(function(self, predicate) {
+            self = Stubs.call(self, predicate);
+            self.thing = new Stub();
             return self;
         });
 
-        describe(".withArgs", function() {
-            it("should spy on its stubs differently based on the arguments",
-            function() {
-                var things = new Things();
+        it("should use different stubs based on its call args", function() {
+            var things = new Things();
 
-                things
-                    .withArgs('a')
-                    .thing.withArgs('b')
-                    .returns('c');
+            things
+                .when(function(arg) { return arg === 'a'; })
+                .thing
+                    .when(function(arg) { return arg === 'b'; })
+                    .returns('foo');
 
-                things
-                    .withArgs(1)
-                    .thing.withArgs(2)
-                    .returns(3);
+            things
+                .when(function(arg) { return arg === 1; })
+                .thing
+                    .when(function(arg) { return arg === 2; })
+                    .returns('bar');
 
-                var checks = [];
-                checks.push(things('a').thing('b').then(function(result) {
-                    assert.equal(result, 'c');
-                }));
-
-                checks.push(things(1).thing(2).then(function(result) {
-                    assert.equal(result, 3);
-                }));
-
-                return Q(checks);
-            });
+            return Q
+                .all([
+                    things('a').thing('b'),
+                    things(1).thing(2)])
+                .then(function(results) {
+                    assert.deepEqual(results, ['foo', 'bar']);
+                });
         });
     });
 
@@ -73,55 +109,39 @@ describe("dummy", function() {
             ureport = new DummyUReportApi();
         });
 
-        function isStub(obj, stub_name) {
-            return obj.stub_name === stub_name;
-        }
-
         describe(".ureporters.get", function() {
             it("should be a stub", function() {
-                assert(isStub(
-                    ureport.ureporters.get,
-                    'ureporters.get'));
+                assert.equal(ureport.ureporters.get.type, Stub);
             });
         });
 
         describe(".ureporters.polls.current", function() {
             it("should be a stub", function() {
-                assert(isStub(
-                    ureport.ureporters().polls.current,
-                    'ureporters.polls.current'));
+                assert.equal(ureport.ureporters.polls.current.type, Stub);
             });
         });
 
         describe(".ureporters.polls.topics", function() {
             it("should be a stub", function() {
-                assert(isStub(
-                    ureport.ureporters().polls.topics,
-                    'ureporters.polls.topics'));
+                assert.equal(ureport.ureporters.polls.topics.type, Stub);
             });
         });
 
         describe(".ureporters.reports.submit", function() {
             it("should be a stub", function() {
-                assert(isStub(
-                    ureport.ureporters().reports.submit,
-                    'ureporters.reports.submit'));
+                assert.equal(ureport.ureporters.reports.submit.type, Stub);
             });
         });
 
         describe(".ureporters.poll.responses.submit", function() {
             it("should be a stub", function() {
-                assert(isStub(
-                    ureport.ureporters().poll().responses.submit,
-                    'ureporters.poll.responses.submit'));
+                assert.equal(ureport.ureporters.poll.responses.submit.type, Stub);
             });
         });
 
         describe(".ureporters.poll.summary", function() {
             it("should be a stub", function() {
-                assert(isStub(
-                    ureport.ureporters().poll().summary,
-                    'ureporters.poll.summary'));
+                assert.equal(ureport.ureporters.poll.summary.type, Stub);
             });
         });
     });
