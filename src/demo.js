@@ -52,7 +52,9 @@ vumi_ureport.demo = function() {
 
     ureport
         .ureporters
-        .poll.withArgs("poll_agriculture")
+        .poll.when(function(poll_id) {
+            return poll_id === "poll_agriculture";
+        })
         .summary.returns({
             total_responses: 5756,
             responses: [ {
@@ -72,7 +74,9 @@ vumi_ureport.demo = function() {
 
     ureport
         .ureporters
-        .poll.withArgs("poll_education")
+        .poll.when(function(poll_id) {
+            return poll_id === "poll_education";
+        })
         .summary.returns({
             total_responses: 6329,
             responses: [ {
