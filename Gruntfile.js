@@ -30,7 +30,6 @@ module.exports = function (grunt) {
         mochaTest: {
             test: {
                 src: [
-                    '<%= paths.src.lib %>',
                     '<%= paths.test.requires %>',
                     '<%= paths.test.spec %>'
                 ],
