@@ -1,4 +1,4 @@
-var vumi_ureport = global.vumi_ureport = {};
+var vumi_ureport = {};
 
 vumi_ureport.api = function() {
     var vumigo = require('vumigo_v02');
