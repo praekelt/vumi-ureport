@@ -90,9 +90,10 @@ vumi_ureport.demo = function() {
 
     ureport
         .ureporters
-        .poll
-        .responses
-        .submit.returns({
+        .poll.when(function(poll_id) {
+            return poll_id === "poll_agriculture";
+        })
+        .responses.submit.returns({
             accepted: true,
             response: null
         });
