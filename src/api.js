@@ -1,4 +1,6 @@
 vumi_ureport.api = function() {
+    var _ = require('underscore');
+
     var vumigo = require('vumigo_v02');
     var utils = vumigo.utils;
     var Extendable = utils.Extendable;
@@ -42,11 +44,45 @@ vumi_ureport.api = function() {
 
         self.polls = {};
 
-        self.polls.current = function() {
+        self.polls._current = function() {
             return self
                 .api.http.get(self.url('polls/current'))
                 .get('data')
                 .get('poll');
+        };
+
+        self.polls._concat = function(poll_a, poll_b) {
+            poll_b.question = [poll_a.question, poll_b.question].join(' ');
+            return poll_b;
+        };
+
+        self.polls.current = function(options) {
+            options = _(options || {}).defaults({
+                nones: {
+                    limit: 1,
+                    use: false,
+                    concat: false
+                }
+            });
+
+            var n = options.nones.limit;
+            var nones = [];
+
+            function next() {
+                return self.polls._current().then(function(poll) {
+                    if (!n-- || poll.type !== 'none' || options.nones.use) {
+                        return options.nones.concat
+                            ? nones.concat([poll]).reduce(self.polls._concat)
+                            : poll;
+                    }
+                    else {
+                        nones.push(poll);
+                        return next();
+                    }
+                });
+            }
+
+            return next();
         };
 
         self.polls.topics = function() {
