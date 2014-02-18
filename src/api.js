@@ -56,22 +56,21 @@ vumi_ureport.api = function() {
             return poll_b;
         };
 
-        self.polls.current = function(options) {
-            options = _(options || {}).defaults({
-                nones: {
-                    limit: 1,
-                    use: false,
-                    concat: false
-                }
+        self.polls.current = function(opts) {
+            opts = _(opts || {}).defaults({nones: {}});
+            _(opts.nones).defaults({
+                limit: 1,
+                use: false,
+                concat: false
             });
 
-            var n = options.nones.limit;
+            var n = opts.nones.limit;
             var nones = [];
 
             function next() {
                 return self.polls._current().then(function(poll) {
-                    if (!n-- || poll.type !== 'none' || options.nones.use) {
-                        return options.nones.concat
+                    if (!(n--) || poll.type !== 'none' || opts.nones.use) {
+                        return opts.nones.concat
                             ? nones.concat([poll]).reduce(self.polls._concat)
                             : poll;
                     }
