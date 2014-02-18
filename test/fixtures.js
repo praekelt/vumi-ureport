@@ -4,13 +4,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_bad_input_got_no_report_response/reports/",
-      "body": {
+      "data": {
         "report": "bad input"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": false,
@@ -26,7 +26,7 @@ return {
     },
     "response": {
       "code": 404,
-      "body": {
+      "data": {
         "success": false,
         "reason": "Ureporter not found"
       }
@@ -39,7 +39,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "user": {
           "registered": false,
@@ -55,7 +55,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "user": {
           "registered": true,
@@ -71,7 +71,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "user": {
           "registered": false,
@@ -87,7 +87,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "user": {
           "registered": true,
@@ -103,7 +103,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "user": {
           "registered": true,
@@ -119,7 +119,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "reg_poll_1",
@@ -145,7 +145,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "reg_poll_1",
@@ -171,7 +171,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "poll_1",
@@ -197,7 +197,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "poll_1",
@@ -223,7 +223,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "poll_2",
@@ -247,9 +247,9 @@ return {
       "method": "GET",
       "url": "http://example.com/ureporters/vumi_go_test/user_on_reg_poll_1/polls/current"
     },
-    "response": {
+    "responses": [{
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "reg_poll_1",
@@ -266,7 +266,26 @@ return {
           "response_type": "allow_all"
         }
       }
-    }
+    }, {
+      "code": 200,
+      "data": {
+        "success": true,
+        "poll": {
+          "id": "reg_poll_2",
+          "language": "en",
+          "name": "Registration Poll 2",
+          "question": "What is the capital of Assyria?",
+          "question_voice": "http://www.example.com/reg_poll_2.ogg",
+          "start_date": "2012-04-23T18:25:43.511Z",
+          "end_date": null,
+          "is_registration": false,
+          "type": "text",
+          "default_response": null,
+          "default_response_voice": null,
+          "response_type": "allow_all"
+        }
+      }
+    }]
   },
   "ureporters.polls.current:user_on_reg_poll_2": {
     "request": {
@@ -275,7 +294,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "reg_poll_2",
@@ -301,7 +320,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "poll_1",
@@ -327,7 +346,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "poll_2",
@@ -353,7 +372,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "reg_poll_1",
@@ -379,7 +398,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll": {
           "id": "reg_poll_2",
@@ -405,7 +424,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll_topics": [
           {
@@ -427,7 +446,7 @@ return {
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "poll_result": {
           "total_responses": 3756,
@@ -449,13 +468,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_on_poll_1/poll/poll_1/responses/",
-      "body": {
+      "data": {
         "response": "To seek the Holy Grail"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": true,
@@ -468,13 +487,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_bad_input_on_poll_1/poll/poll_1/responses/",
-      "body": {
+      "data": {
         "response": "bad input"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": false,
@@ -487,13 +506,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_on_poll_2/poll/poll_2/responses/",
-      "body": {
+      "data": {
         "response": "Blue"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": true,
@@ -506,13 +525,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_bad_input_on_poll_2/poll/poll_2/responses/",
-      "body": {
+      "data": {
         "response": "bad input"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": false,
@@ -525,13 +544,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_on_reg_poll_1/poll/reg_poll_1/responses/",
-      "body": {
+      "data": {
         "response": "21"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": true,
@@ -544,13 +563,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_bad_input_on_reg_poll_1/poll/reg_poll_1/responses/",
-      "body": {
+      "data": {
         "response": "bad input"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": false,
@@ -563,13 +582,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_on_reg_poll_2/poll/reg_poll_2/responses/",
-      "body": {
+      "data": {
         "response": "I don't know that"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": true,
@@ -582,13 +601,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_bad_input_on_reg_poll_2/poll/reg_poll_2/responses/",
-      "body": {
+      "data": {
         "response": "bad input"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": false,
@@ -601,13 +620,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_default/reports/",
-      "body": {
+      "data": {
         "report": "report text"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": true,
@@ -620,13 +639,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_got_no_report_response/reports/",
-      "body": {
+      "data": {
         "report": "report text"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": true,
@@ -639,13 +658,13 @@ return {
     "request": {
       "method": "POST",
       "url": "http://example.com/ureporters/vumi_go_test/user_bad_input/reports/",
-      "body": {
+      "data": {
         "report": "bad input"
       }
     },
     "response": {
       "code": 200,
-      "body": {
+      "data": {
         "success": true,
         "result": {
           "accepted": false,
