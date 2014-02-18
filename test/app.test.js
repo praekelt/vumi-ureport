@@ -13,17 +13,12 @@ describe("app", function() {
         var app;
         var tester;
         
-        function add_fixture(k) {
-            var f = fixtures()[k];
-            f.request.body = JSON.stringify(f.request.body);
-            f.response.body = JSON.stringify(f.response.body);
-            f.request.content_type = 'application/json; charset=utf-8';
-            tester.api.add_http_fixture(f);
-        }
-
         beforeEach(function() {
             app = new VumiUReportApp();
-            tester = new AppTester(app);
+
+            tester = new AppTester(app, {
+                api: {http: {encoding: 'json'}}
+            });
 
             tester
                 .setup.config({
@@ -38,8 +33,8 @@ describe("app", function() {
                     }
                 })
                 .setup.user({addr: 'user_default'})
-                .setup(function() {
-                    _(fixtures()).keys().forEach(add_fixture);
+                .setup(function(api) {
+                    _(fixtures()).values().forEach(api.http.fixtures.add);
                 });
         });
 
@@ -97,14 +92,14 @@ describe("app", function() {
                     .setup.user.addr('user_on_reg_poll_1')
                     .input('21')
                     .check(function(api, im) {
-                        var req = _(api.http_requests).findWhere({
+                        var req = _(api.http.requests).findWhere({
                             url: [
                                 'http://example.com/ureporters/vumi_go_test/',
                                 'user_on_reg_poll_1/poll/reg_poll_1/responses/'
                             ].join('')
                         });
 
-                        assert.equal(JSON.parse(req.body).response, '21');
+                        assert.equal(req.data.response, '21');
                     })
                     .run();
             });
@@ -116,7 +111,7 @@ describe("app", function() {
                             .setup.user.state('states:register')
                             .setup.user.addr('user_on_reg_poll_1')
                             .input("21")
-                            .check.reply("How old are you?")
+                            .check.reply("What is the capital of Assyria?")
                             .check.user.state('states:register')
                             .run();
                     });
@@ -247,7 +242,7 @@ describe("app", function() {
                     .setup.user.state('states:poll:question')
                     .input("To seek the Holy Grail")
                     .check(function(api) {
-                        var req = _(api.http_requests).findWhere({
+                        var req = _(api.http.requests).findWhere({
                             url: [
                                 'http://example.com/ureporters/vumi_go_test/',
                                 'user_on_poll_1/poll/poll_1/responses/'
@@ -255,7 +250,7 @@ describe("app", function() {
                         });
 
                         assert.equal(
-                            JSON.parse(req.body).response,
+                            req.data.response,
                             'To seek the Holy Grail');
                     })
                     .run();
@@ -414,16 +409,14 @@ describe("app", function() {
                     .setup.user.state('states:reports:submit')
                     .input("report text")
                     .check(function(api) {
-                        var req = _(api.http_requests).findWhere({
+                        var req = _(api.http.requests).findWhere({
                             url: [
                                 'http://example.com/ureporters/vumi_go_test/',
                                 'user_default/reports/'
                             ].join('')
                         });
 
-                        assert.equal(
-                            JSON.parse(req.body).report,
-                            "report text");
+                        assert.equal(req.data.report, "report text");
                     })
                     .run();
             });
