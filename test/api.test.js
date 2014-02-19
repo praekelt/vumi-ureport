@@ -1,7 +1,7 @@
-var _ = require('underscore');
 var assert = require('assert');
 
 var vumigo = require('vumigo_v02');
+var DummyApi = vumigo.DummyApi;
 var test_utils = vumigo.test_utils;
 var utils = vumigo.utils;
 
@@ -10,40 +10,13 @@ var UReportApi = vumi_ureport.api.UReportApi;
 
 describe("api", function() {
     describe("UReportApi", function() {
+        var api;
         var ureport;
 
-        function add_fixture(ureport, opts) {
-            opts.request = _(opts.request || {}).defaults({
-                content_type: 'application/json; charset=utf-8'
-            });
-
-            opts.response = _(opts.response || {}).defaults({
-                code: 200
-            });
-
-            if ('data' in opts.request) {
-                opts.request.body = JSON.stringify(opts.request.data);
-            }
-
-            if ('data' in opts.response) {
-                opts.response.body = JSON.stringify(opts.response.data);
-            }
-
-            ureport.im.api.add_http_fixture(opts);
-        }
-
-        function get_request(ureport) {
-            var request = ureport.im.api.http_requests[0];
-
-            if (request.body) {
-                request.data = JSON.parse(request.body);
-            }
-
-            return request;
-        }
-
         beforeEach(function() {
-            return test_utils.make_im().then(function(im) {
+            api = new DummyApi({http: {default_encoding: 'json'}});
+
+            return test_utils.make_im({api: api}).then(function(im) {
                 ureport = new UReportApi(
                     im,
                     'http://example.com',
@@ -52,7 +25,7 @@ describe("api", function() {
         });
 
         it("should support basic auth", function() {
-            return test_utils.make_im().then(function(im) {
+            return test_utils.make_im({api: api}).then(function(im) {
                 var ureport = new UReportApi(
                     im,
                     'http://example.com',
@@ -63,7 +36,7 @@ describe("api", function() {
                         }
                     });
 
-                add_fixture(ureport, {
+                api.http.fixtures.add({
                     request: {
                         method: 'GET',
                         url: [
@@ -83,7 +56,7 @@ describe("api", function() {
                     .ureporters('+256775551122')
                     .get()
                     .then(function() {
-                        var request = get_request(ureport);
+                        var request = api.http.requests[0];
                         assert.deepEqual(
                             request.headers.Authorization,
                             [utils.basic_auth('root', 'toor')]);
@@ -93,7 +66,7 @@ describe("api", function() {
 
         describe(".ureporters.get", function() {
             it("should return the ureporter's data", function() {
-                add_fixture(ureport, {
+                api.http.fixtures.add({
                     request: {
                         method: 'GET',
                         url: [
@@ -124,7 +97,7 @@ describe("api", function() {
             });
 
             it("should return null if the ureporter is not found", function() {
-                add_fixture(ureport, {
+                api.http.fixtures.add({
                     request: {
                         method: 'GET',
                         url: [
@@ -146,7 +119,7 @@ describe("api", function() {
 
         describe(".ureporters.polls.current", function() {
             it("should the return current poll", function() {
-                add_fixture(ureport, {
+                api.http.fixtures.add({
                     request: {
                         method: 'GET',
                         url: [
@@ -158,7 +131,11 @@ describe("api", function() {
                     response: {
                         data: {
                             success: true,
-                            poll: {id: '1234'}
+                            poll: {
+                                id: '1234',
+                                type: 'text',
+                                question: 'What is your name?'
+                            }
                         }
                     }
                 });
@@ -167,14 +144,205 @@ describe("api", function() {
                     .ureporters('+256775551122')
                     .polls.current()
                     .then(function(poll) {
-                        assert.deepEqual(poll, {id: '1234'});
+                        assert.deepEqual(poll, {
+                            id: '1234',
+                            type: 'text',
+                            question: 'What is your name?'
+                        });
                     });
+            });
+
+            describe("if a none poll is given back", function() {
+                it("should get the next poll until the given limit is hit",
+                function() {
+                    api.http.fixtures.add({
+                        request: {
+                            method: 'GET',
+                            url: [
+                                'http://example.com',
+                                'ureporters/vumi_go_sms/+256775551122',
+                                'polls/current'
+                            ].join('/')
+                        },
+                        responses: [{
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: null,
+                                    type: 'none',
+                                    question: 'Hello!'
+                                }
+                            }
+                        }, {
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: null,
+                                    type: 'none',
+                                    question: 'Welcome!'
+                                }
+                            }
+                        }, {
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: '1234',
+                                    type: 'text',
+                                    question: 'What is your name?'
+                                }
+                            }
+                        }]
+                    });
+
+                    return ureport
+                        .ureporters('+256775551122')
+                        .polls.current({nones: {limit: 2}})
+                        .then(function(poll) {
+                            assert.deepEqual(poll, {
+                                id: '1234',
+                                type: 'text',
+                                question: 'What is your name?'
+                            });
+                        });
+                });
+
+                it("should not get the next poll if asked to use nones",
+                function() {
+                    api.http.fixtures.add({
+                        request: {
+                            method: 'GET',
+                            url: [
+                                'http://example.com',
+                                'ureporters/vumi_go_sms/+256775551122',
+                                'polls/current'
+                            ].join('/')
+                        },
+                        responses: [{
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: null,
+                                    type: 'none',
+                                    question: 'Hello!'
+                                }
+                            }
+                        }, {
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: '1234',
+                                    type: 'text',
+                                    question: 'What is your name?'
+                                }
+                            }
+                        }]
+                    });
+
+                    return ureport
+                        .ureporters('+256775551122')
+                        .polls.current({nones: {use: true}})
+                        .then(function(poll) {
+                            assert.deepEqual(poll, {
+                                id: null,
+                                type: 'none',
+                                question: 'Hello!'
+                            });
+                        });
+                });
+
+                it("should get the next poll until a non-none poll is given",
+                function() {
+                    api.http.fixtures.add({
+                        request: {
+                            method: 'GET',
+                            url: [
+                                'http://example.com',
+                                'ureporters/vumi_go_sms/+256775551122',
+                                'polls/current'
+                            ].join('/')
+                        },
+                        responses: [{
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: null,
+                                    type: 'none',
+                                    question: 'Hello!'
+                                }
+                            }
+                        }, {
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: '1234',
+                                    type: 'text',
+                                    question: 'What is your name?'
+                                }
+                            }
+                        }]
+                    });
+
+                    return ureport
+                        .ureporters('+256775551122')
+                        .polls.current({nones: {limit: 10}})
+                        .then(function(poll) {
+                            assert.deepEqual(poll, {
+                                id: '1234',
+                                type: 'text',
+                                question: 'What is your name?'
+                            });
+                        });
+                });
+
+                it("should concat the non-polls to the actual poll if asked",
+                function() {
+                    api.http.fixtures.add({
+                        request: {
+                            method: 'GET',
+                            url: [
+                                'http://example.com',
+                                'ureporters/vumi_go_sms/+256775551122',
+                                'polls/current'
+                            ].join('/')
+                        },
+                        responses: [{
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: null,
+                                    type: 'none',
+                                    question: 'Hello!'
+                                }
+                            }
+                        }, {
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: '1234',
+                                    type: 'text',
+                                    question: 'What is your name?'
+                                }
+                            }
+                        }]
+                    });
+
+                    return ureport
+                        .ureporters('+256775551122')
+                        .polls.current({nones: {concat: true}})
+                        .then(function(poll) {
+                            assert.deepEqual(poll, {
+                                id: '1234',
+                                type: 'text',
+                                question: 'Hello! What is your name?'
+                            });
+                        });
+                });
             });
         });
 
         describe(".ureporters.polls.topics", function() {
             it("should the return current topics", function() {
-                add_fixture(ureport, {
+                api.http.fixtures.add({
                     request: {
                         method: 'GET',
                         url: [
@@ -202,7 +370,7 @@ describe("api", function() {
 
         describe(".ureporters.poll.responses.submit", function() {
             beforeEach(function() {
-                add_fixture(ureport, {
+                api.http.fixtures.add({
                     request: {
                         method: 'POST',
                         url: [
@@ -230,7 +398,7 @@ describe("api", function() {
                     .poll('1234')
                     .responses.submit('response text')
                     .then(function() {
-                        var request = get_request(ureport);
+                        var request = api.http.requests[0];
 
                         assert.deepEqual(
                             request.data,
@@ -254,7 +422,7 @@ describe("api", function() {
 
         describe(".ureporters.poll.summary", function() {
             it("should return the poll summary", function() {
-                add_fixture(ureport, {
+                api.http.fixtures.add({
                     request: {
                         method: 'GET',
                         url: [
@@ -283,7 +451,7 @@ describe("api", function() {
 
         describe(".ureporters.reports.submit", function() {
             beforeEach(function() {
-                add_fixture(ureport, {
+                api.http.fixtures.add({
                     request: {
                         method: 'POST',
                         url: [
@@ -310,7 +478,7 @@ describe("api", function() {
                     .ureporters('+256775551122')
                     .reports.submit('report text')
                     .then(function() {
-                        var request = get_request(ureport);
+                        var request = api.http.requests[0];
 
                         assert.deepEqual(
                             request.data,

@@ -33,7 +33,7 @@ vumi_ureport.app = function() {
             var parts = [];
             parts.push(['Total responses', data.total_responses].join(': '));
             data.responses.forEach(function(response) {
-                parts.push([response.label, response.count].join(': '));
+                parts.push([response.name, response.count].join(': '));
             });
             return parts.join('\n');
         };
