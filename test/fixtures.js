@@ -104,8 +104,8 @@ module.exports = function() {
                     "type": "t",
                     "start_date": null
                 },
+                "success": true
             },
-            "success": true
         }
     },
     {
@@ -413,8 +413,8 @@ module.exports = function() {
                     "type": "t",
                     "start_date": null
                 },
+                "success": true
             },
-            "success": true
         }
     },
     {
@@ -438,8 +438,8 @@ module.exports = function() {
                     "type": "t",
                     "start_date": null
                 },
+                "success": true
             },
-            "success": true
         }
     },
     {
@@ -463,8 +463,8 @@ module.exports = function() {
                     "type": "t",
                     "start_date": null
                 },
+                "success": true
             },
-            "success": true
         }
     },
     {
@@ -488,8 +488,8 @@ module.exports = function() {
                     "type": "t",
                     "start_date": null
                 },
+                "success": true
             },
-            "success": true
         }
     },
     {
@@ -706,22 +706,6 @@ module.exports = function() {
             "data": {
                 "success": true,
                 "poll_topics": []
-            }
-        }
-    },
-    {
-        "request": {
-            "method": "POST",
-            "url": "http://example.com/ureporters/vumi_go_test/user_default/reports",
-            "data": {
-                "report": "report text"
-            }
-        },
-        "response": {
-            "code": 200,
-            "data": {
-                "response": "Thank you for your report.",
-                "success": true
             }
         }
     },
