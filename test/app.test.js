@@ -145,7 +145,7 @@ describe("app", function() {
                             "We did not understand your response",
                             "to registration poll 1, please try again."
                         ].join(' '))
-                        .check.user.state('states:register:rejected')
+                        .check.user.state('states:register')
                         .run();
                 });
 
@@ -156,41 +156,7 @@ describe("app", function() {
                         .setup.user.addr('user_bad_input_on_reg_poll_2')
                         .input("bad input")
                         .check.reply("Response rejected, please try again.")
-                        .check.user.state('states:register:rejected')
-                        .run();
-                });
-            });
-        });
-
-        describe("when the user is asked try a registration poll again",
-        function() {
-            describe("if the user's input was accepted", function() {
-                it("should show the main menu", function() {
-                    return tester
-                        .setup.user.addr('user_on_reg_poll_2')
-                        .setup.user.state('states:register:rejected')
-                        .setup.user.state.creator_opts({poll_id: 'reg_poll_2'})
-                        .input("I don't know that")
-                        .check.reply([
-                            "Ureport (Speak out for your community)",
-                            "1. This week's question",
-                            "2. Poll results",
-                            "3. Send report"
-                        ].join('\n'))
-                        .check.user.state('states:main_menu')
-                        .run();
-                });
-            });
-
-            describe("if the user's input was not accepted", function() {
-                it("should ask the user to try again", function() {
-                    return tester
-                        .setup.user.addr('user_bad_input_on_reg_poll_2')
-                        .setup.user.state('states:register:rejected')
-                        .setup.user.state.creator_opts({poll_id: 'reg_poll_2'})
-                        .input("bad input")
-                        .check.reply("Response rejected, please try again.")
-                        .check.user.state('states:register:rejected')
+                        .check.user.state('states:register')
                         .run();
                 });
             });
@@ -297,7 +263,7 @@ describe("app", function() {
                             "We did not understand your response",
                             "to poll 1, please try again."
                         ].join(' '))
-                        .check.user.state('states:poll:question:rejected')
+                        .check.user.state('states:poll:question')
                         .run();
                 });
 
@@ -308,38 +274,7 @@ describe("app", function() {
                         .setup.user.addr('user_bad_input_on_poll_2')
                         .input("bad input")
                         .check.reply("Response rejected, please try again.")
-                        .check.user.state('states:poll:question:rejected')
-                        .run();
-                });
-            });
-        });
-
-        describe("when the user is asked try a poll again", function() {
-            describe("if the user's input was accepted", function() {
-                it("should show the user ureport's response", function() {
-                    return tester
-                        .setup.user.addr('user_on_poll_1')
-                        .setup.user.state('states:poll:question:rejected')
-                        .setup.user.state.creator_opts({poll_id: 'poll_1'})
-                        .input("To seek the Holy Grail")
-                        .check.reply([
-                            "Thank you for answering poll 1. " +
-                            "View the results so far?",
-                            "1. Yes",
-                            "2. No"
-                        ].join('\n'))
-                        .run();
-                });
-            });
-
-            describe("if the user's input was not accepted", function() {
-                it("should ask the user to try again", function() {
-                    return tester
-                        .setup.user.addr('user_bad_input_on_poll_2')
-                        .setup.user.state('states:poll:question:rejected')
-                        .setup.user.state.creator_opts({poll_id: 'poll_2'})
-                        .input("bad input")
-                        .check.reply("Response rejected, please try again.")
+                        .check.user.state('states:poll:question')
                         .run();
                 });
             });
@@ -455,7 +390,7 @@ describe("app", function() {
                             "We did not understand your report,",
                             "please try again"
                         ].join(' '))
-                        .check.user.state('states:reports:submit:rejected')
+                        .check.user.state('states:reports:submit')
                         .run();
                 });
 
@@ -466,36 +401,7 @@ describe("app", function() {
                         .setup.user.state('states:reports:submit')
                         .input("bad input")
                         .check.reply("Response rejected, please try again.")
-                        .check.user.state('states:reports:submit:rejected')
-                        .run();
-                });
-            });
-        });
-
-        describe("when the user is asked to try submit their report again",
-        function() {
-            describe("if the user's input was accepted", function() {
-                it("should show the user ureport's response", function() {
-                    return tester
-                        .setup.user.state('states:reports:submit:rejected')
-                        .input("report text")
-                        .check.reply("Thank you for your report.")
-                        .check.user.state('states:reports:submit:accepted')
-                        .run();
-                });
-            });
-
-            describe("if the user's input was not accepted", function() {
-                it("should ask the user to try again", function() {
-                    return tester
-                        .setup.user.addr('user_bad_input')
-                        .setup.user.state('states:reports:submit:rejected')
-                        .input("bad input")
-                        .check.reply([
-                            "We did not understand your report,",
-                            "please try again"
-                        ].join(' '))
-                        .check.user.state('states:reports:submit:rejected')
+                        .check.user.state('states:reports:submit')
                         .run();
                 });
             });
@@ -511,7 +417,7 @@ describe("app", function() {
             });
         });
 
-        describe("when the user at the end of the session screen", function() {
+        describe("when the user is at the end of the session screen", function() {
             it("should start at the beginning on the next session", function() {
                 return tester
                     .setup.user.state('states:end')
