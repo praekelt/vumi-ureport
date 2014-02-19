@@ -14,7 +14,7 @@ describe("api", function() {
         var ureport;
 
         beforeEach(function() {
-            api = new DummyApi({http: {encoding: 'json'}});
+            api = new DummyApi({http: {default_encoding: 'json'}});
 
             return test_utils.make_im({api: api}).then(function(im) {
                 ureport = new UReportApi(
