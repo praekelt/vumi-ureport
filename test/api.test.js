@@ -152,6 +152,74 @@ describe("api", function() {
                     });
             });
 
+            describe("if null is given back", function() {
+                it("should use the none polls if available", function() {
+                    api.http.fixtures.add({
+                        request: {
+                            method: 'GET',
+                            url: [
+                                'http://example.com',
+                                'ureporters/vumi_go_sms/+256775551122',
+                                'polls/current'
+                            ].join('/')
+                        },
+                        responses: [{
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: null,
+                                    type: 'none',
+                                    question: 'Hello!'
+                                }
+                            }
+                        }, {
+                            data: {
+                                success: true,
+                                poll: null
+                            }
+                        }]
+                    });
+
+                    return ureport
+                        .ureporters('+256775551122')
+                        .polls.current()
+                        .then(function(poll) {
+                            assert.deepEqual(poll, {
+                                id: null,
+                                type: 'none',
+                                question: 'Hello!'
+                            });
+                        });
+                });
+
+                it("should return null if no none polls are available",
+                function() {
+                    api.http.fixtures.add({
+                        request: {
+                            method: 'GET',
+                            url: [
+                                'http://example.com',
+                                'ureporters/vumi_go_sms/+256775551122',
+                                'polls/current'
+                            ].join('/')
+                        },
+                        response: {
+                            data: {
+                                success: true,
+                                poll: null
+                            }
+                        }
+                    });
+
+                    return ureport
+                        .ureporters('+256775551122')
+                        .polls.current()
+                        .then(function(poll) {
+                            assert.strictEqual(poll, null); 
+                        });
+                });
+            });
+
             describe("if a none poll is given back", function() {
                 it("should get the next poll until the given limit is hit",
                 function() {
