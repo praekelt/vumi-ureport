@@ -17,7 +17,7 @@ describe("app", function() {
             app = new VumiUReportApp();
 
             tester = new AppTester(app, {
-                api: {http: {encoding: 'json'}}
+                api: {http: {default_encoding: 'json'}}
             });
 
             tester
