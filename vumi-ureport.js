@@ -59,6 +59,8 @@ vumi_ureport.api = function() {
         };
 
         self.polls.current = function(opts) {
+            var polls = [];
+
             opts = _(opts || {}).defaults({nones: {}});
             _(opts.nones).defaults({
                 limit: 1,
@@ -66,20 +68,29 @@ vumi_ureport.api = function() {
                 concat: false
             });
 
-            var n = opts.nones.limit;
-            var nones = [];
+            function done() {
+                return opts.nones.concat
+                    ? _(polls).reduce(self.polls._concat)
+                    : _(polls).last()
+                   || null;
+            }
+
+            function is_last(poll) {
+                return polls.length > opts.nones.limit
+                    || !poll
+                    || poll.type !== 'none'
+                    || opts.nones.use;
+            }
 
             function next() {
                 return self.polls._current().then(function(poll) {
-                    if (!(n--) || poll.type !== 'none' || opts.nones.use) {
-                        return opts.nones.concat
-                            ? nones.concat([poll]).reduce(self.polls._concat)
-                            : poll;
+                    if (poll) {
+                        polls.push(poll);
                     }
-                    else {
-                        nones.push(poll);
-                        return next();
-                    }
+
+                    return is_last(poll)
+                        ? done()
+                        : next();
                 });
             }
 
@@ -222,6 +233,10 @@ vumi_ureport.app = function() {
             var error = "Response rejected, please try again.";
 
             return self.ureporter.polls.current().then(function(poll) {
+                if (poll === null) {
+                    return self.states.create('states:register:none');
+                }
+
                 return new FreeText(name, {
                     question: poll.question,
 
@@ -267,6 +282,10 @@ vumi_ureport.app = function() {
             var response;
 
             return self.ureporter.polls.current().then(function(poll) {
+                if (poll === null) {
+                    return self.states.create('states:poll:none');
+                }
+
                 return new FreeText(name, {
                     question: poll.question,
 
@@ -293,6 +312,15 @@ vumi_ureport.app = function() {
                         };
                     }
                 });
+            });
+        });
+
+        self.states.add('states:poll:none', function(name) {
+            return new EndState(name, {
+                text: [
+                    "There is currently no poll available,",
+                    "please try again later"].join(' '),
+                next: 'states:start'
             });
         });
 
