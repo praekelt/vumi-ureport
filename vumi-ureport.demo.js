@@ -5,8 +5,8 @@ vumi_ureport.api = function() {
     var utils = vumigo.utils;
     var Extendable = utils.Extendable;
 
-    var JsonApi = vumigo.http_api.JsonApi;
-    var HttpResponseError = vumigo.http_api.HttpResponseError;
+    var JsonApi = vumigo.http.api.JsonApi;
+    var HttpResponseError = vumigo.http.api.HttpResponseError;
 
     var UReportApi = Extendable.extend(function(self, im, url, backend, opts) {
         opts = opts || {};
