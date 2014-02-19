@@ -34,7 +34,7 @@ describe("app", function() {
                 })
                 .setup.user({addr: 'user_default'})
                 .setup(function(api) {
-                    _(fixtures()).values().forEach(api.http.fixtures.add);
+                    fixtures().forEach(api.http.fixtures.add);
                 });
         });
 
@@ -355,8 +355,9 @@ describe("app", function() {
                         .input('1')
                         .check.reply([
                             "Total responses: 3756",
-                            "Choice 1: 1234",
-                            "Choice 2: 2522"
+                            "Uncategorized: 423",
+                            "22 - 31: 2500",
+                            "32 - 41: 833"
                         ].join('\n'))
                         .check.user.state('states:results:view')
                         .run();
@@ -384,8 +385,9 @@ describe("app", function() {
                     .input('1')
                     .check.reply([
                         "Total responses: 3756",
-                        "Choice 1: 1234",
-                        "Choice 2: 2522"
+                        "Uncategorized: 423",
+                        "22 - 31: 2500",
+                        "32 - 41: 833"
                     ].join('\n'))
                     .check.user.state('states:results:view')
                     .run();

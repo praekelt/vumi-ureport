@@ -1,6 +1,8 @@
 var vumi_ureport = {};
 
 vumi_ureport.api = function() {
+    var _ = require('underscore');
+
     var vumigo = require('vumigo_v02');
     var utils = vumigo.utils;
     var Extendable = utils.Extendable;
@@ -44,11 +46,44 @@ vumi_ureport.api = function() {
 
         self.polls = {};
 
-        self.polls.current = function() {
+        self.polls._current = function() {
             return self
                 .api.http.get(self.url('polls/current'))
                 .get('data')
                 .get('poll');
+        };
+
+        self.polls._concat = function(poll_a, poll_b) {
+            poll_b.question = [poll_a.question, poll_b.question].join(' ');
+            return poll_b;
+        };
+
+        self.polls.current = function(opts) {
+            opts = _(opts || {}).defaults({nones: {}});
+            _(opts.nones).defaults({
+                limit: 1,
+                use: false,
+                concat: false
+            });
+
+            var n = opts.nones.limit;
+            var nones = [];
+
+            function next() {
+                return self.polls._current().then(function(poll) {
+                    if (!(n--) || poll.type !== 'none' || opts.nones.use) {
+                        return opts.nones.concat
+                            ? nones.concat([poll]).reduce(self.polls._concat)
+                            : poll;
+                    }
+                    else {
+                        nones.push(poll);
+                        return next();
+                    }
+                });
+            }
+
+            return next();
         };
 
         self.polls.topics = function() {
@@ -162,7 +197,7 @@ vumi_ureport.app = function() {
             var parts = [];
             parts.push(['Total responses', data.total_responses].join(': '));
             data.responses.forEach(function(response) {
-                parts.push([response.label, response.count].join(': '));
+                parts.push([response.name, response.count].join(': '));
             });
             return parts.join('\n');
         };
