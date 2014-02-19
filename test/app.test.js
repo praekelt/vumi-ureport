@@ -209,19 +209,46 @@ describe("app", function() {
             });
 
             describe("if the user chooses to view the results", function() {
-                it("should show the user the current poll topics", function() {
-                    return tester
-                        .setup.user.state('states:main_menu')
-                        .input('2')
-                        .check.reply([
-                            "Choose poll:",
-                            "1. Poll 1",
-                            "2. Poll 2"
-                        ].join('\n'))
-                        .check.user.state('states:results:choose')
-                        .run();
+                describe("if there are poll topics", function() {
+                    it("should show the user the current topics", function() {
+                        return tester
+                            .setup.user.state('states:main_menu')
+                            .input('2')
+                            .check.reply([
+                                "Choose poll:",
+                                "1. Poll 1",
+                                "2. Poll 2"
+                            ].join('\n'))
+                            .check.user.state('states:results:choose')
+                            .run();
+                    });
+                });
+
+                describe("if there are no poll topics", function() {
+                    it("should tell the user there are no topics", function() {
+                        return tester
+                            .setup.user.state('states:main_menu')
+                            .setup.user.addr('user_on_empty_topics')
+                            .input('2')
+                            .check.reply([
+                                "There are no polls to see results at",
+                                "the moment, please try again later."
+                            ].join(' '))
+                            .check.user.state('states:results:empty')
+                            .run();
+                    });
                 });
             });
+
+        describe("when the user is told there are no topics", function() {
+            it("should start at the beginning on the next session", function() {
+                return tester
+                    .setup.user.state('states:results:empty')
+                    .start()
+                    .check.user.state('states:main_menu')
+                    .run();
+            });
+        });
 
             describe("if the user chooses to submit a report", function() {
                 it("should ask the user to enter their report", function() {

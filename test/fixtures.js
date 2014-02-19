@@ -698,6 +698,19 @@ module.exports = function() {
     },
     {
         "request": {
+            "method": "GET",
+            "url": "http://example.com/ureporters/vumi_go_test/user_on_empty_topics/polls/topics"
+        },
+        "response": {
+            "code": 200,
+            "data": {
+                "success": true,
+                "poll_topics": []
+            }
+        }
+    },
+    {
+        "request": {
             "method": "POST",
             "url": "http://example.com/ureporters/vumi_go_test/user_default/reports",
             "data": {
