@@ -58,6 +58,10 @@ vumi_ureport.app = function() {
             var error = "Response rejected, please try again.";
 
             return self.ureporter.polls.current().then(function(poll) {
+                if (poll === null) {
+                    return self.states.create('states:register:none');
+                }
+
                 return new FreeText(name, {
                     question: poll.question,
 
@@ -103,6 +107,10 @@ vumi_ureport.app = function() {
             var response;
 
             return self.ureporter.polls.current().then(function(poll) {
+                if (poll === null) {
+                    return self.states.create('states:poll:none');
+                }
+
                 return new FreeText(name, {
                     question: poll.question,
 
@@ -129,6 +137,15 @@ vumi_ureport.app = function() {
                         };
                     }
                 });
+            });
+        });
+
+        self.states.add('states:poll:none', function(name) {
+            return new EndState(name, {
+                text: [
+                    "There is currently no poll available,",
+                    "please try again later"].join(' '),
+                next: 'states:start'
             });
         });
 
