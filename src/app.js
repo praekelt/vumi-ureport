@@ -54,52 +54,26 @@ vumi_ureport.app = function() {
         });
 
         // TODO what to do with submission response?
-        self.states.add('states:register', function(name) {
+        self.states.add('states:register', function(name, opts) {
+            var error = "Response rejected, please try again.";
+
             return self.ureporter.polls.current().then(function(poll) {
                 return new FreeText(name, {
                     question: poll.question,
-                    next: {
-                        name: 'states:register:next',
-                        creator_opts: {poll_id: poll.id}
-                    }
+
+                    check: function(content) {
+                        return self
+                            .ureporter.poll(poll.id)
+                            .responses.submit(content)
+                            .then(function(result) {
+                                if (!result.accepted) {
+                                    return result.response || error;
+                                }
+                            });
+                    },
+
+                    next: 'states:start'
                 });
-            });
-        });
-
-        self.states.add('states:register:next', function(name, opts) {
-            _(opts).defaults({rejected: false});
-
-            var content = opts.rejected
-                ? self.user.get_answer('states:register:rejected')
-                : self.user.get_answer('states:register');
-
-            return self
-                .ureporter.poll(opts.poll_id)
-                .responses.submit(content)
-                .then(function(result) {
-                    return result.accepted
-                        ? self.states.create('states:start')
-                        : self.states.create('states:register:rejected', {
-                            poll_id: opts.poll_id,
-                            response: result.response
-                        });
-                });
-        });
-
-        // TODO what to put as default 'not accepted' response
-        self.states.add('states:register:rejected', function(name, opts) {
-            opts.response = opts.response
-                         || "Response rejected, please try again.";
-
-            return new FreeText(name, {
-                question: opts.response,
-                next: {
-                    name: 'states:register:next',
-                    creator_opts: {
-                        rejected: true,
-                        poll_id: opts.poll_id
-                    }
-                }
             });
         });
 
@@ -107,11 +81,13 @@ vumi_ureport.app = function() {
         self.states.add('states:main_menu', function(name) {
             return new ChoiceState(name, {
                 question: "Ureport (Speak out for your community)",
+
                 choices: [
                     new Choice('poll', "This week's question"),
                     new Choice('results', 'Poll results'),
                     new Choice('reports', 'Send report')
                 ],
+
                 next: function(choice) {
                     return {
                         poll: 'states:poll:question',
@@ -123,54 +99,36 @@ vumi_ureport.app = function() {
         });
 
         self.states.add('states:poll:question', function(name) {
+            var error =  "Response rejected, please try again.";
+            var response;
+
             return self.ureporter.polls.current().then(function(poll) {
                 return new FreeText(name, {
                     question: poll.question,
-                    next: {
-                        name: 'states:poll:question:next',
-                        creator_opts: {poll_id: poll.id}
+
+                    check: function(content) {
+                        return self
+                            .ureporter.poll(poll.id)
+                            .responses.submit(content)
+                            .then(function(result) {
+                                response = result.response;
+
+                                if (!result.accepted) {
+                                    return response || error;
+                                }
+                            });
+                    },
+
+                    next: function() {
+                        return {
+                            name: 'states:poll:question:accepted',
+                            creator_opts: {
+                                poll_id: poll.id,
+                                response: response
+                            }
+                        };
                     }
                 });
-            });
-        });
-
-        self.states.add('states:poll:question:next', function(name, opts) {
-            _(opts).defaults({rejected: false});
-
-            var content = opts.rejected
-                ? self.user.get_answer('states:poll:question:rejected')
-                : self.user.get_answer('states:poll:question');
-
-            return self
-                .ureporter.poll(opts.poll_id)
-                .responses.submit(content)
-                .then(function(result) {
-                    return result.accepted
-                        ? self.states.create('states:poll:question:accepted', {
-                            poll_id: opts.poll_id,
-                            response: result.response
-                        })
-                        : self.states.create('states:poll:question:rejected', {
-                            poll_id: opts.poll_id,
-                            response: result.response
-                        });
-                });
-        });
-
-        // TODO what to put as default 'not accepted' response
-        self.states.add('states:poll:question:rejected', function(name, opts) {
-            opts.response = opts.response
-                         || "Response rejected, please try again.";
-
-            return new FreeText(name, {
-                question: opts.response,
-                next: {
-                    name: 'states:poll:question:next',
-                    creator_opts: {
-                        rejected: true,
-                        poll_id: opts.poll_id
-                    }
-                }
             });
         });
 
@@ -183,20 +141,22 @@ vumi_ureport.app = function() {
 
             return new ChoiceState(name, {
                 question: opts.response,
+
                 choices: [
                     new Choice('yes', 'Yes'),
                     new Choice('no', 'No')],
-                    next: function(choice) {
-                        if (choice.value == 'no') {
-                            return 'states:end';
-                        }
-                        else if (choice.value == 'yes') {
-                            return {
-                                name: 'states:results:view',
-                                creator_opts: {poll_id: opts.poll_id}
-                            };
-                        }
+
+                next: function(choice) {
+                    if (choice.value == 'no') {
+                        return 'states:end';
                     }
+                    else if (choice.value == 'yes') {
+                        return {
+                            name: 'states:results:view',
+                            creator_opts: {poll_id: opts.poll_id}
+                        };
+                    }
+                }
             });
         });
 
@@ -205,9 +165,11 @@ vumi_ureport.app = function() {
             return self.ureporter.polls.topics().then(function(topics) {
                 return new ChoiceState(name, {
                     question: "Choose poll:",
+                    
                     choices: topics.map(function(topic) {
                         return new Choice(topic.poll_id, topic.label);
                     }),
+
                     next: function(choice) {
                         return {
                             name: 'states:results:view',
@@ -231,42 +193,29 @@ vumi_ureport.app = function() {
         });
 
         self.states.add('states:reports:submit', function(name) {
+            var error = "Response rejected, please try again.";
+            var response;
+
             return new FreeText(name, {
                 question: "Enter message:",
-                next: 'states:reports:submit:next'
-            });
-        });
 
-        self.states.add('states:reports:submit:next', function(name, opts) {
-            _(opts).defaults({rejected: false});
+                check: function(content) {
+                    return self
+                        .ureporter.reports.submit(content)
+                        .then(function(result) {
+                            response = result.response;
 
-            var content = opts.rejected
-                ? self.user.get_answer('states:reports:submit:rejected')
-                : self.user.get_answer('states:reports:submit');
-
-            return self
-                .ureporter.reports.submit(content)
-                .then(function(result) {
-                    return result.accepted
-                        ? self.states.create('states:reports:submit:accepted', {
-                            response: result.response
-                        })
-                        : self.states.create('states:reports:submit:rejected', {
-                            response: result.response
+                            if (!result.accepted) {
+                                return response || error;
+                            }
                         });
-                });
-        });
+                },
 
-        // TODO what to put as default 'not accepted' response
-        self.states.add('states:reports:submit:rejected', function(name, opts) {
-            opts.response = opts.response
-                         || "Response rejected, please try again.";
-
-            return new FreeText(name, {
-                question: opts.response,
-                next: {
-                    name: 'states:reports:submit:next',
-                    creator_opts: {rejected: true}
+                next: function() {
+                    return {
+                        name: 'states:reports:submit:accepted',
+                        creator_opts: {response: response}
+                    };
                 }
             });
         });
