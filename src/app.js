@@ -163,6 +163,10 @@ vumi_ureport.app = function() {
         // TODO what to put as default question?
         self.states.add('states:results:choose', function(name) {
             return self.ureporter.polls.topics().then(function(topics) {
+                if (!topics.length) {
+                    return self.states.create('states:results:empty');
+                }
+
                 return new ChoiceState(name, {
                     question: "Choose poll:",
                     
@@ -177,6 +181,16 @@ vumi_ureport.app = function() {
                         };
                     }
                 });
+            });
+        });
+
+        // TODO what to put as text
+        self.states.add('states:results:empty', function(name) {
+            return new EndState(name, {
+                text: [
+                    "There are no polls to see results at the moment,",
+                    "please try again later."].join(' '),
+                next: 'states:start'
             });
         });
 
