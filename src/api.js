@@ -57,6 +57,8 @@ vumi_ureport.api = function() {
         };
 
         self.polls.current = function(opts) {
+            var polls = [];
+
             opts = _(opts || {}).defaults({nones: {}});
             _(opts.nones).defaults({
                 limit: 1,
@@ -64,20 +66,29 @@ vumi_ureport.api = function() {
                 concat: false
             });
 
-            var n = opts.nones.limit;
-            var nones = [];
+            function done() {
+                return opts.nones.concat
+                    ? _(polls).reduce(self.polls._concat)
+                    : _(polls).last()
+                   || null;
+            }
+
+            function is_last(poll) {
+                return polls.length > opts.nones.limit
+                    || !poll
+                    || poll.type !== 'none'
+                    || opts.nones.use;
+            }
 
             function next() {
                 return self.polls._current().then(function(poll) {
-                    if (!(n--) || poll.type !== 'none' || opts.nones.use) {
-                        return opts.nones.concat
-                            ? nones.concat([poll]).reduce(self.polls._concat)
-                            : poll;
+                    if (poll) {
+                        polls.push(poll);
                     }
-                    else {
-                        nones.push(poll);
-                        return next();
-                    }
+
+                    return is_last(poll)
+                        ? done()
+                        : next();
                 });
             }
 

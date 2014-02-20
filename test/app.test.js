@@ -164,13 +164,29 @@ describe("app", function() {
 
         describe("when the user is on the main menu", function() {
             describe("if the user chooses to take the poll", function() {
-                it("should show the user the current poll", function() {
-                    return tester
-                        .setup.user.state('states:main_menu')
-                        .input('1')
-                        .check.reply("What is your quest?")
-                        .check.user.state('states:poll:question')
-                        .run();
+                describe("if there is a current poll", function() {
+                    it("should show the user the current poll", function() {
+                        return tester
+                            .setup.user.state('states:main_menu')
+                            .input('1')
+                            .check.reply("What is your quest?")
+                            .check.user.state('states:poll:question')
+                            .run();
+                    });
+                });
+
+                describe("if there is no current poll", function() {
+                    it("should tell the user", function() {
+                        return tester
+                            .setup.user.state('states:main_menu')
+                            .setup.user.addr('user_no_polls')
+                            .input('1')
+                            .check.reply([
+                                "There is currently no poll available,",
+                                "please try again later"].join(' '))
+                            .check.user.state('states:poll:none')
+                            .run();
+                    });
                 });
             });
 

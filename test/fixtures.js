@@ -43,6 +43,20 @@ module.exports = function() {
     },
     {
         "request": {
+            "url": "http://example.com/ureporters/vumi_go_test/user_no_polls"
+        },
+        "response": {
+            "data": {
+                "success": true,
+                "user": {
+                    "registered": false,
+                    "language": "en"
+                }
+            }
+        }
+    },
+    {
+        "request": {
             "url": "http://example.com/ureporters/vumi_go_test/user_on_reg_poll_1"
         },
         "response": {
@@ -488,6 +502,18 @@ module.exports = function() {
                     "type": "t",
                     "start_date": null
                 },
+                "success": true
+            },
+        }
+    },
+    {
+        "request": {
+            "method": "GET",
+            "url": "http://example.com/ureporters/vumi_go_test/user_no_polls/polls/current"
+        },
+        "response": {
+            "data": {
+                "poll": null,
                 "success": true
             },
         }
