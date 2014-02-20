@@ -180,6 +180,7 @@ vumi_ureport.app = function() {
     var vumigo = require('vumigo_v02');
     var App = vumigo.App;
     var Choice = vumigo.states.Choice;
+    var MenuState = vumigo.states.MenuState;
     var ChoiceState = vumigo.states.ChoiceState;
     var FreeText = vumigo.states.FreeText;
     var EndState = vumigo.states.EndState;
@@ -258,22 +259,14 @@ vumi_ureport.app = function() {
 
         // TODO what to put as question?
         self.states.add('states:main_menu', function(name) {
-            return new ChoiceState(name, {
+            return new MenuState(name, {
                 question: "Ureport (Speak out for your community)",
 
                 choices: [
-                    new Choice('poll', "This week's question"),
-                    new Choice('results', 'Poll results'),
-                    new Choice('reports', 'Send report')
-                ],
-
-                next: function(choice) {
-                    return {
-                        poll: 'states:poll:question',
-                        results: 'states:results:choose',
-                        reports: 'states:reports:submit'
-                    }[choice.value];
-                }
+                    new Choice('states:poll:question', "This week's question"),
+                    new Choice('states:results:choose', 'Poll results'),
+                    new Choice('states:reports:submit', 'Send report')
+                ]
             });
         });
 
