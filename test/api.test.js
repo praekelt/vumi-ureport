@@ -41,7 +41,7 @@ describe("api", function() {
                         method: 'GET',
                         url: [
                             'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
+                            'ureporters/vumi_go_sms/%2B256775551122'
                         ].join('/')
                     },
                     response: {
@@ -71,7 +71,7 @@ describe("api", function() {
                         method: 'GET',
                         url: [
                             'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
+                            'ureporters/vumi_go_sms/%2B256775551122'
                         ].join('/')
                     },
                     response: {
@@ -102,7 +102,7 @@ describe("api", function() {
                         method: 'GET',
                         url: [
                             'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122'
+                            'ureporters/vumi_go_sms/%2B256775551122'
                         ].join('/')
                     },
                     response: {code: 404}
@@ -124,7 +124,7 @@ describe("api", function() {
                         method: 'GET',
                         url: [
                             'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122',
+                            'ureporters/vumi_go_sms/%2B256775551122',
                             'polls/current'
                         ].join('/')
                     },
@@ -159,7 +159,7 @@ describe("api", function() {
                             method: 'GET',
                             url: [
                                 'http://example.com',
-                                'ureporters/vumi_go_sms/+256775551122',
+                                'ureporters/vumi_go_sms/%2B256775551122',
                                 'polls/current'
                             ].join('/')
                         },
@@ -199,7 +199,7 @@ describe("api", function() {
                             method: 'GET',
                             url: [
                                 'http://example.com',
-                                'ureporters/vumi_go_sms/+256775551122',
+                                'ureporters/vumi_go_sms/%2B256775551122',
                                 'polls/current'
                             ].join('/')
                         },
@@ -228,7 +228,7 @@ describe("api", function() {
                             method: 'GET',
                             url: [
                                 'http://example.com',
-                                'ureporters/vumi_go_sms/+256775551122',
+                                'ureporters/vumi_go_sms/%2B256775551122',
                                 'polls/current'
                             ].join('/')
                         },
@@ -281,7 +281,7 @@ describe("api", function() {
                             method: 'GET',
                             url: [
                                 'http://example.com',
-                                'ureporters/vumi_go_sms/+256775551122',
+                                'ureporters/vumi_go_sms/%2B256775551122',
                                 'polls/current'
                             ].join('/')
                         },
@@ -325,7 +325,7 @@ describe("api", function() {
                             method: 'GET',
                             url: [
                                 'http://example.com',
-                                'ureporters/vumi_go_sms/+256775551122',
+                                'ureporters/vumi_go_sms/%2B256775551122',
                                 'polls/current'
                             ].join('/')
                         },
@@ -369,7 +369,7 @@ describe("api", function() {
                             method: 'GET',
                             url: [
                                 'http://example.com',
-                                'ureporters/vumi_go_sms/+256775551122',
+                                'ureporters/vumi_go_sms/%2B256775551122',
                                 'polls/current'
                             ].join('/')
                         },
@@ -415,7 +415,7 @@ describe("api", function() {
                         method: 'GET',
                         url: [
                             'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122',
+                            'ureporters/vumi_go_sms/%2B256775551122',
                             'polls/topics'
                         ].join('/')
                     },
@@ -443,7 +443,7 @@ describe("api", function() {
                         method: 'POST',
                         url: [
                             'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122',
+                            'ureporters/vumi_go_sms/%2B256775551122',
                             'poll/1234/responses/'
                         ].join('/'),
                         data: {response: 'response text'}
@@ -495,7 +495,7 @@ describe("api", function() {
                         method: 'GET',
                         url: [
                             'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122',
+                            'ureporters/vumi_go_sms/%2B256775551122',
                             'poll/1234/summary'
                         ].join('/')
                     },
@@ -524,7 +524,7 @@ describe("api", function() {
                         method: 'POST',
                         url: [
                             'http://example.com',
-                            'ureporters/vumi_go_sms/+256775551122',
+                            'ureporters/vumi_go_sms/%2B256775551122',
                             'reports/'
                         ].join('/'),
                         data: {report: 'report text'}
