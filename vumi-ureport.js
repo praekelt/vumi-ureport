@@ -23,7 +23,10 @@ vumi_ureport.api = function() {
         };
 
         self.ureporters = function(user_addr) {
-            var rel_path = join_paths('ureporters', self.backend, user_addr);
+            var rel_path = join_paths(
+                'ureporters',
+                encodeURIComponent(self.backend),
+                encodeURIComponent(user_addr));
             return new UReportersApi(self, rel_path);
         };
     });
@@ -105,7 +108,8 @@ vumi_ureport.api = function() {
         };
 
         self.poll = function(id) {
-            return new PollApi(self, join_paths('poll', id));
+            return new PollApi(self, join_paths(
+                'poll', encodeURIComponent(id)));
         };
 
         self.reports = {};
