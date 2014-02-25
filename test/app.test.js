@@ -213,7 +213,7 @@ describe("app", function() {
                             .setup.user.addr('user_on_empty_topics')
                             .input('2')
                             .check.reply([
-                                "There are no polls to see results at",
+                                "There are no polls to see results for at",
                                 "the moment, please try again later."
                             ].join(' '))
                             .check.user.state('states:results:empty')

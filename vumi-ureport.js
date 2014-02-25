@@ -377,7 +377,7 @@ vumi_ureport.app = function() {
         self.states.add('states:results:empty', function(name) {
             return new EndState(name, {
                 text: [
-                    "There are no polls to see results at the moment,",
+                    "There are no polls to see results for at the moment,",
                     "please try again later."].join(' '),
                 next: 'states:start'
             });
