@@ -9,6 +9,8 @@ vumi_ureport.app = function() {
     var ChoiceState = vumigo.states.ChoiceState;
     var FreeText = vumigo.states.FreeText;
     var EndState = vumigo.states.EndState;
+
+    var PollSummaryState = vumi_ureport.states.PollSummaryState;
     var UReportApi = vumi_ureport.api.UReportApi;
 
     var VumiUReportApp = App.extend(function(self, opts) {
@@ -29,15 +31,6 @@ vumi_ureport.app = function() {
                 api_config.backend,
                 {auth: api_config.auth});
             self.ureporter = self.ureport.ureporters(self.user.addr);
-        };
-
-        self.format_summary = function(data) {
-            var parts = [];
-            parts.push(['Total responses', data.total_responses].join(': '));
-            data.responses.forEach(function(response) {
-                parts.push([response.name, response.count].join(': '));
-            });
-            return parts.join('\n');
         };
 
         self.states.add('states:start', function() {
@@ -210,8 +203,9 @@ vumi_ureport.app = function() {
             .ureporter.poll(opts.poll_id)
             .summary()
             .then(function(summary) {
-                return new EndState(name, {
-                    text: self.format_summary(summary),
+                return new PollSummaryState(name, {
+                    total_responses_label: $("Total responses"),
+                    summary: summary,
                     next: 'states:start'
                 });
             });
