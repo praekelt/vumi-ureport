@@ -21,7 +21,7 @@ vumi_ureport.app = function() {
             self.user = self.im.user;
             self.config = self.im.config;
 
-            var api_config = self.im.config.get('ureport_api');
+            var api_config = self.config.ureport_api;
             self.ureport = self.ureport || new UReportApi(
                 self.im,
                 api_config.url,
