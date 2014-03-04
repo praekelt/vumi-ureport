@@ -15,13 +15,13 @@ describe("states", function() {
                 locale_data: {
                     messages: {
                         '': {},
-                        "Total Responses": [null, "i18n(Total Responses)"]
+                        "Total responses": [null, "i18n(Total responses)"]
                     }
                 }
             });
 
-            state = new PollSummaryState({
-                total_responses_label: test_utils.$('Total Responses'),
+            state = new PollSummaryState('foo', {
+                total_responses_label: test_utils.$('Total responses'),
                 summary: {
                     total_responses: 3756,
                     responses: [{
@@ -42,14 +42,14 @@ describe("states", function() {
             it("should translate its 'total responses' label", function() {
                 assert.deepEqual(state.total_responses_label, {
                     method: 'gettext',
-                    args: ['Total Responses']
+                    args: ['Total responses']
                 });
 
                 state.translate(i18n);
 
                 assert.equal(
                     state.total_responses_label,
-                    'i18n(Total Responses)');
+                    'i18n(Total responses)');
             });
         });
 
@@ -57,7 +57,7 @@ describe("states", function() {
             it("should display the summary", function() {
                 state.translate(i18n);
                 assert.equal(state.display(), [
-                    "i18n(Total Responses): 3756",
+                    "i18n(Total responses): 3756",
                     "Uncategorized: 423",
                     "22 - 31: 2500",
                     "32 - 41: 833"

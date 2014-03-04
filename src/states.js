@@ -2,11 +2,11 @@ vumi_ureport.states = function() {
     var vumigo = require('vumigo_v02');
     var EndState = vumigo.states.EndState;
 
-    var PollSummaryState = EndState.extend(function(self, opts) {
+    var PollSummaryState = EndState.extend(function(self, name, opts) {
         opts.text = null;
         self.summary = opts.summary;
         self.total_responses_label = opts.total_responses_label;
-        EndState.call(self, opts);
+        EndState.call(self, name, opts);
 
         self.translate = function(i18n) {
             self.total_responses_label = i18n(self.total_responses_label);
