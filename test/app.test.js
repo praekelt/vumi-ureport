@@ -222,15 +222,16 @@ describe("app", function() {
                 });
             });
 
-        describe("when the user is told there are no topics", function() {
-            it("should start at the beginning on the next session", function() {
-                return tester
-                    .setup.user.state('states:results:empty')
-                    .start()
-                    .check.user.state('states:main_menu')
-                    .run();
+            describe("when the user is told there are no topics", function() {
+                it("should start at the beginning on the next session",
+                function() {
+                    return tester
+                        .setup.user.state('states:results:empty')
+                        .start()
+                        .check.user.state('states:main_menu')
+                        .run();
+                });
             });
-        });
 
             describe("if the user chooses to submit a report", function() {
                 it("should ask the user to enter their report", function() {
