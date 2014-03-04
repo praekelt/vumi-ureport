@@ -21,7 +21,7 @@ describe("app", function() {
             });
 
             tester
-                .setup.config({
+                .setup.config.app({
                     name: 'test_ureport',
                     ureport_api: {
                         url: 'http://example.com',
