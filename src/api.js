@@ -1,5 +1,5 @@
 vumi_ureport.api = function() {
-    var _ = require('underscore');
+    var _ = require('lodash');
 
     var vumigo = require('vumigo_v02');
     var utils = vumigo.utils;
@@ -62,8 +62,8 @@ vumi_ureport.api = function() {
         self.polls.current = function(opts) {
             var polls = [];
 
-            opts = _(opts || {}).defaults({nones: {}});
-            _(opts.nones).defaults({
+            opts = _.defaults(opts || {}, {nones: {}});
+            _.defaults(opts.nones, {
                 limit: 1,
                 use: false,
                 concat: false
@@ -71,8 +71,8 @@ vumi_ureport.api = function() {
 
             function done() {
                 return opts.nones.concat
-                    ? _(polls).reduce(self.polls._concat)
-                    : _(polls).last()
+                    ? _.reduce(polls, self.polls._concat)
+                    : _.last(polls)
                    || null;
             }
 

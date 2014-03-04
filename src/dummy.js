@@ -1,6 +1,6 @@
 vumi_ureport.dummy = function() {
     var Q = require('q');
-    var _ = require('underscore');
+    var _ = require('lodash');
 
     var vumigo = require('vumigo_v02');
     var utils = vumigo.utils;
@@ -13,7 +13,7 @@ vumi_ureport.dummy = function() {
         self = function() {
             var args = arguments;
 
-            var match = _(self.subordinates).find(function(subordinate) {
+            var match = _.find(self.subordinates, function(subordinate) {
                 return subordinate.predicate.apply(self, args);
             });
 

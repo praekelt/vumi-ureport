@@ -3,6 +3,7 @@ var src = exports.src = {};
 src.app = [
     'src/index.js',
     'src/api.js',
+    'src/states.js',
     'src/app.js'
 ];
 

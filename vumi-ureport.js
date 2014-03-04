@@ -1,7 +1,7 @@
 var vumi_ureport = {};
 
 vumi_ureport.api = function() {
-    var _ = require('underscore');
+    var _ = require('lodash');
 
     var vumigo = require('vumigo_v02');
     var utils = vumigo.utils;
@@ -64,8 +64,8 @@ vumi_ureport.api = function() {
         self.polls.current = function(opts) {
             var polls = [];
 
-            opts = _(opts || {}).defaults({nones: {}});
-            _(opts.nones).defaults({
+            opts = _.defaults(opts || {}, {nones: {}});
+            _.defaults(opts.nones, {
                 limit: 1,
                 use: false,
                 concat: false
@@ -73,8 +73,8 @@ vumi_ureport.api = function() {
 
             function done() {
                 return opts.nones.concat
-                    ? _(polls).reduce(self.polls._concat)
-                    : _(polls).last()
+                    ? _.reduce(polls, self.polls._concat)
+                    : _.last(polls)
                    || null;
             }
 
@@ -177,9 +177,44 @@ vumi_ureport.api = function() {
     };
 }();
 
+vumi_ureport.states = function() {
+    var vumigo = require('vumigo_v02');
+    var EndState = vumigo.states.EndState;
+
+    var PollSummaryState = EndState.extend(function(self, name, opts) {
+        opts.text = null;
+        self.summary = opts.summary;
+        self.total_responses_label = opts.total_responses_label;
+        EndState.call(self, name, opts);
+
+        self.translate = function(i18n) {
+            self.total_responses_label = i18n(self.total_responses_label);
+        };
+
+        self.display = function(i18n) {
+            var parts = [];
+
+            parts.push([
+                self.total_responses_label,
+                self.summary.total_responses
+            ].join(': '));
+
+            self.summary.responses.forEach(function(response) {
+                parts.push([response.name, response.count].join(': '));
+            });
+
+            return parts.join('\n');
+        };
+    });
+
+    return {
+        PollSummaryState: PollSummaryState
+    };
+}();
+
 vumi_ureport.app = function() {
     var Q = require('q');
-    var _ = require('underscore');
+    var _ = require('lodash');
 
     var vumigo = require('vumigo_v02');
     var App = vumigo.App;
@@ -188,34 +223,28 @@ vumi_ureport.app = function() {
     var ChoiceState = vumigo.states.ChoiceState;
     var FreeText = vumigo.states.FreeText;
     var EndState = vumigo.states.EndState;
+
+    var PollSummaryState = vumi_ureport.states.PollSummaryState;
     var UReportApi = vumi_ureport.api.UReportApi;
 
     var VumiUReportApp = App.extend(function(self, opts) {
         App.call(self, 'states:start');
+        var $ = self.$;
 
-        opts = _(opts || {}).defaults({ureport: null});
+        opts = _.defaults(opts || {}, {ureport: null});
         self.ureport = opts.ureport;
 
         self.init = function() {
             self.user = self.im.user;
             self.config = self.im.config;
 
-            var api_config = self.im.config.get('ureport_api');
+            var api_config = self.config.ureport_api;
             self.ureport = self.ureport || new UReportApi(
                 self.im,
                 api_config.url,
                 api_config.backend,
                 {auth: api_config.auth});
             self.ureporter = self.ureport.ureporters(self.user.addr);
-        };
-
-        self.format_summary = function(data) {
-            var parts = [];
-            parts.push(['Total responses', data.total_responses].join(': '));
-            data.responses.forEach(function(response) {
-                parts.push([response.name, response.count].join(': '));
-            });
-            return parts.join('\n');
         };
 
         self.states.add('states:start', function() {
@@ -235,7 +264,7 @@ vumi_ureport.app = function() {
 
         // TODO what to do with submission response?
         self.states.add('states:register', function(name, opts) {
-            var error = "Response rejected, please try again.";
+            var error = $("Response rejected, please try again.");
 
             return self.ureporter.polls.current().then(function(poll) {
                 if (poll === null) {
@@ -264,18 +293,18 @@ vumi_ureport.app = function() {
         // TODO what to put as question?
         self.states.add('states:main_menu', function(name) {
             return new MenuState(name, {
-                question: "Ureport (Speak out for your community)",
+                question: $("Ureport (Speak out for your community)"),
 
                 choices: [
-                    new Choice('states:poll:question', "This week's question"),
-                    new Choice('states:results:choose', 'Poll results'),
-                    new Choice('states:reports:submit', 'Send report')
+                    new Choice('states:poll:question', $("This week's question")),
+                    new Choice('states:results:choose', $('Poll results')),
+                    new Choice('states:reports:submit', $('Send report'))
                 ]
             });
         });
 
         self.states.add('states:poll:question', function(name) {
-            var error =  "Response rejected, please try again.";
+            var error =  $("Response rejected, please try again.");
             var response;
 
             return self.ureporter.polls.current().then(function(poll) {
@@ -314,26 +343,26 @@ vumi_ureport.app = function() {
 
         self.states.add('states:poll:none', function(name) {
             return new EndState(name, {
-                text: [
+                text: $([
                     "There is currently no poll available,",
-                    "please try again later"].join(' '),
+                    "please try again later"].join(' ')),
                 next: 'states:start'
             });
         });
 
         // TODO what to put as default question?
         self.states.add('states:poll:question:accepted', function(name, opts) {
-            opts.response = opts.response || [
+            opts.response = opts.response || $([
                 "Thank you for your response.",
                 "View the results so far?"
-            ].join(' ');
+            ].join(' '));
 
             return new ChoiceState(name, {
                 question: opts.response,
 
                 choices: [
-                    new Choice('yes', 'Yes'),
-                    new Choice('no', 'No')],
+                    new Choice('yes', $('Yes')),
+                    new Choice('no', $('No'))],
 
                 next: function(choice) {
                     if (choice.value == 'no') {
@@ -357,7 +386,7 @@ vumi_ureport.app = function() {
                 }
 
                 return new ChoiceState(name, {
-                    question: "Choose poll:",
+                    question: $("Choose poll:"),
                     
                     choices: topics.map(function(topic) {
                         return new Choice(topic.poll_id, topic.label);
@@ -376,9 +405,9 @@ vumi_ureport.app = function() {
         // TODO what to put as text
         self.states.add('states:results:empty', function(name) {
             return new EndState(name, {
-                text: [
+                text: $([
                     "There are no polls to see results for at the moment,",
-                    "please try again later."].join(' '),
+                    "please try again later."].join(' ')),
                 next: 'states:start'
             });
         });
@@ -388,19 +417,20 @@ vumi_ureport.app = function() {
             .ureporter.poll(opts.poll_id)
             .summary()
             .then(function(summary) {
-                return new EndState(name, {
-                    text: self.format_summary(summary),
+                return new PollSummaryState(name, {
+                    total_responses_label: $("Total responses"),
+                    summary: summary,
                     next: 'states:start'
                 });
             });
         });
 
         self.states.add('states:reports:submit', function(name) {
-            var error = "Response rejected, please try again.";
+            var error = $("Response rejected, please try again.");
             var response;
 
             return new FreeText(name, {
-                question: "Enter message:",
+                question: $("Enter message:"),
 
                 check: function(content) {
                     return self
@@ -425,7 +455,7 @@ vumi_ureport.app = function() {
 
         // TODO what to put as default response
         self.states.add('states:reports:submit:accepted', function(name, opts) {
-            opts.response = opts.response || "Thank you for your msg.";
+            opts.response = opts.response || $("Thank you for your msg.");
 
             return new EndState(name, {
                 text: opts.response,
@@ -436,7 +466,7 @@ vumi_ureport.app = function() {
         // TODO what to put as default end response
         self.states.add('states:end', function(name) {
             return new EndState(name, {
-                text: "Thank you for using Ureport.",
+                text: $("Thank you for using Ureport."),
                 next: 'states:start'
             });
         });

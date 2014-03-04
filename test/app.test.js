@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = require('lodash');
 var assert = require('assert');
 
 var vumigo = require('vumigo_v02');
@@ -21,7 +21,7 @@ describe("app", function() {
             });
 
             tester
-                .setup.config({
+                .setup.config.app({
                     name: 'test_ureport',
                     ureport_api: {
                         url: 'http://example.com',
@@ -92,7 +92,7 @@ describe("app", function() {
                     .setup.user.addr('user_on_reg_poll_1')
                     .input('21')
                     .check(function(api, im) {
-                        var req = _(api.http.requests).findWhere({
+                        var req = _.find(api.http.requests, {
                             url: [
                                 'http://example.com/ureporters/vumi_go_test/',
                                 'user_on_reg_poll_1/poll/reg_poll_1/responses/'
@@ -222,15 +222,16 @@ describe("app", function() {
                 });
             });
 
-        describe("when the user is told there are no topics", function() {
-            it("should start at the beginning on the next session", function() {
-                return tester
-                    .setup.user.state('states:results:empty')
-                    .start()
-                    .check.user.state('states:main_menu')
-                    .run();
+            describe("when the user is told there are no topics", function() {
+                it("should start at the beginning on the next session",
+                function() {
+                    return tester
+                        .setup.user.state('states:results:empty')
+                        .start()
+                        .check.user.state('states:main_menu')
+                        .run();
+                });
             });
-        });
 
             describe("if the user chooses to submit a report", function() {
                 it("should ask the user to enter their report", function() {
@@ -251,7 +252,7 @@ describe("app", function() {
                     .setup.user.state('states:poll:question')
                     .input("To seek the Holy Grail")
                     .check(function(api) {
-                        var req = _(api.http.requests).findWhere({
+                        var req = _.find(api.http.requests, {
                             url: [
                                 'http://example.com/ureporters/vumi_go_test/',
                                 'user_on_poll_1/poll/poll_1/responses/'
@@ -389,7 +390,7 @@ describe("app", function() {
                     .setup.user.state('states:reports:submit')
                     .input("report text")
                     .check(function(api) {
-                        var req = _(api.http.requests).findWhere({
+                        var req = _.find(api.http.requests, {
                             url: [
                                 'http://example.com/ureporters/vumi_go_test/',
                                 'user_default/reports/'
