@@ -1,7 +1,6 @@
 var assert = require('assert');
 
 var vumigo = require('vumigo_v02');
-var DummyApi = vumigo.DummyApi;
 var test_utils = vumigo.test_utils;
 var utils = vumigo.utils;
 
@@ -14,9 +13,11 @@ describe("api", function() {
         var ureport;
 
         beforeEach(function() {
-            api = new DummyApi({http: {default_encoding: 'json'}});
+            return test_utils.make_im({
+                api: {http: {default_encoding: 'json'}}
+            }).then(function(im) {
+                api = im.api;
 
-            return test_utils.make_im({api: api}).then(function(im) {
                 ureport = new UReportApi(
                     im,
                     'http://example.com',
