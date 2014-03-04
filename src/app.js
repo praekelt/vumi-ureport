@@ -1,6 +1,6 @@
 vumi_ureport.app = function() {
     var Q = require('q');
-    var _ = require('underscore');
+    var _ = require('lodash');
 
     var vumigo = require('vumigo_v02');
     var App = vumigo.App;
@@ -14,7 +14,7 @@ vumi_ureport.app = function() {
     var VumiUReportApp = App.extend(function(self, opts) {
         App.call(self, 'states:start');
 
-        opts = _(opts || {}).defaults({ureport: null});
+        opts = _.defaults(opts || {}, {ureport: null});
         self.ureport = opts.ureport;
 
         self.init = function() {
