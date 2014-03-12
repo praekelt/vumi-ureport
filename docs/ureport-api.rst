@@ -181,6 +181,8 @@ API methods
    * ``end_date``: The date and time on which the poll ended (or will end).
    * ``is_registration``: ``true`` for polls that are part of
      registration, ``false`` otherwise.
+   * ``is_registration_end``: ``true`` for polls that end registration,
+     ``false`` otherwise.
    * ``type``: The data type of responses to the question. See below for
      the possible values.
    * ``default_response``: The ``default_response`` is the default text to
@@ -256,6 +258,7 @@ API methods
           "start_date": "2012-04-23T18:25:43.511Z",
           "end_date": null,
           "is_registration": false,
+          "is_registration_end": false,
           "type": "text",
           "default_response": null,
           "default_response_voice": null,
