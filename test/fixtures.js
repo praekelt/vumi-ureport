@@ -114,6 +114,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is your quest?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -152,6 +153,7 @@ module.exports = function() {
                     "language": null,
                     "question": "How old are you?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -171,6 +173,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is the capital of Assyria?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -210,6 +213,7 @@ module.exports = function() {
                     "language": null,
                     "question": "How old are you?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -229,6 +233,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is the capital of Assyria?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -269,6 +274,7 @@ module.exports = function() {
                     "language": null,
                     "question": "How old are you?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -288,6 +294,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is the capital of Assyria?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -328,6 +335,7 @@ module.exports = function() {
                     "language": null,
                     "question": "How old are you?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -347,6 +355,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is the capital of Assyria?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -361,7 +370,7 @@ module.exports = function() {
             "method": "GET",
             "url": "http://example.com/ureporters/vumi_go_test/user_on_reg_poll_2/polls/current"
         },
-        "response": {
+        "responses": [{
             "data": {
                 "poll": {
                     "question_voice": null,
@@ -373,9 +382,41 @@ module.exports = function() {
                     "language": null,
                     "question": "What is the capital of Assyria?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
+                },
+                "success": true
+            },
+        }, {
+            "data": {
+                "poll": {
+                    "type": "none",
+                    "question": "Congratulations, you are now registered!",
+                    "id": null,
+                    "name": "Message",
+                    "is_registration": true,
+                    "is_registration_end": true
+                },
+                "success": true
+            },
+        }]
+    },
+    {
+        "request": {
+            "method": "GET",
+            "url": "http://example.com/ureporters/vumi_go_test/user_on_reg_end_poll/polls/current"
+        },
+        "response": {
+            "data": {
+                "poll": {
+                    "type": "none",
+                    "question": "Congratulations, you are now registered!",
+                    "id": null,
+                    "name": "Message",
+                    "is_registration": true,
+                    "is_registration_end": true
                 },
                 "success": true
             },
@@ -398,6 +439,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is the capital of Assyria?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -423,6 +465,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is your quest?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -448,6 +491,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is your quest?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -473,6 +517,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is your favourite colour?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
@@ -498,6 +543,7 @@ module.exports = function() {
                     "language": null,
                     "question": "What is your favourite colour?",
                     "is_registration": true,
+                    "is_registration_end": false,
                     "default_response_voice": null,
                     "type": "t",
                     "start_date": null
