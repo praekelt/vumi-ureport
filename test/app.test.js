@@ -45,7 +45,7 @@ describe("app", function() {
                         .setup.user({addr: 'user_not_found'})
                         .start()
                         .check.reply("How old are you?")
-                        .check.user.state('states:register')
+                        .check.user.state('states:register:question')
                         .run();
                 });
             });
@@ -56,7 +56,7 @@ describe("app", function() {
                         .setup.user({addr: 'user_not_registered'})
                         .start()
                         .check.reply("How old are you?")
-                        .check.user.state('states:register')
+                        .check.user.state('states:register:question')
                         .run();
                 });
             });
@@ -85,7 +85,7 @@ describe("app", function() {
             });
         });
 
-        describe("when the user is on a registration poll", function() {
+        describe("when the user is on a registration question poll", function() {
             it("should send the user's response to ureport", function() {
                 return tester
                     .setup.user.state('states:register')
@@ -112,24 +112,23 @@ describe("app", function() {
                             .setup.user.addr('user_on_reg_poll_1')
                             .input("21")
                             .check.reply("What is the capital of Assyria?")
-                            .check.user.state('states:register')
+                            .check.user.state('states:register:question')
                             .run();
                     });
                 });
 
-                describe("if it is the last registration poll", function() {
-                    it("should show the main menu", function() {
+                describe("if it is the last registration question poll",
+                function() {
+                    it("should show the registration end poll", function() {
                         return tester
                             .setup.user.state('states:register')
                             .setup.user.addr('user_on_reg_poll_2')
                             .input("I don't know that")
-                            .check.reply([
-                                "Ureport (Speak out for your community)",
-                                "1. This week's question",
-                                "2. Poll results",
-                                "3. Send report"
-                            ].join('\n'))
-                            .check.user.state('states:main_menu')
+                            .check.reply.properties({
+                                content: "Congratulations, you are now registered!",
+                                continue_session: false
+                            })
+                            .check.user.state('states:register:end')
                             .run();
                     });
                 });
@@ -145,7 +144,7 @@ describe("app", function() {
                             "We did not understand your response",
                             "to registration poll 1, please try again."
                         ].join(' '))
-                        .check.user.state('states:register')
+                        .check.user.state('states:register:question')
                         .run();
                 });
 
@@ -156,7 +155,7 @@ describe("app", function() {
                         .setup.user.addr('user_bad_input_on_reg_poll_2')
                         .input("bad input")
                         .check.reply("Response rejected, please try again.")
-                        .check.user.state('states:register')
+                        .check.user.state('states:register:question')
                         .run();
                 });
             });

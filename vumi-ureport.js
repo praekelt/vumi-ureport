@@ -81,8 +81,9 @@ vumi_ureport.api = function() {
             function is_last(poll) {
                 return polls.length > opts.nones.limit
                     || !poll
+                    || opts.nones.use
                     || poll.type !== 'none'
-                    || opts.nones.use;
+                    || poll.is_registration_end;
             }
 
             function next() {
@@ -244,6 +245,7 @@ vumi_ureport.app = function() {
                 api_config.url,
                 api_config.backend,
                 {auth: api_config.auth});
+
             self.ureporter = self.ureport.ureporters(self.user.addr);
         };
 
@@ -262,31 +264,50 @@ vumi_ureport.app = function() {
             });
         });
 
-        // TODO what to do with submission response?
-        self.states.add('states:register', function(name, opts) {
-            var error = $("Response rejected, please try again.");
-
+        self.states.add('states:register', function(name) {
             return self.ureporter.polls.current().then(function(poll) {
                 if (poll === null) {
                     return self.states.create('states:register:none');
                 }
 
-                return new FreeText(name, {
-                    question: poll.question,
+                if (poll.is_registration_end) {
+                    return self.states.create('states:register:end', {
+                        poll: poll
+                    });
+                }
 
-                    check: function(content) {
-                        return self
-                            .ureporter.poll(poll.id)
-                            .responses.submit(content)
-                            .then(function(result) {
-                                if (!result.accepted) {
-                                    return result.response || error;
-                                }
-                            });
-                    },
-
-                    next: 'states:start'
+                return self.states.create('states:register:question', {
+                    poll: poll
                 });
+            });
+        });
+
+        // TODO what to do with submission response?
+        self.states.add('states:register:question', function(name, opts) {
+            var error = $("Response rejected, please try again.");
+
+            return new FreeText(name, {
+                question: opts.poll.question,
+
+                check: function(content) {
+                    return self
+                        .ureporter.poll(opts.poll.id)
+                        .responses.submit(content)
+                        .then(function(result) {
+                            if (!result.accepted) {
+                                return result.response || error;
+                            }
+                        });
+                },
+
+                next: 'states:register'
+            });
+        });
+
+        self.states.add('states:register:end', function(name, opts) {
+            return new EndState(name, {
+                text: opts.poll.question,
+                next: 'states:start'
             });
         });
 

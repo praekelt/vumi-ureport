@@ -79,8 +79,9 @@ vumi_ureport.api = function() {
             function is_last(poll) {
                 return polls.length > opts.nones.limit
                     || !poll
+                    || opts.nones.use
                     || poll.type !== 'none'
-                    || opts.nones.use;
+                    || poll.is_registration_end;
             }
 
             function next() {

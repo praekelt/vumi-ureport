@@ -80,7 +80,7 @@ describe("api", function() {
                             success: true,
                             user: {
                                 registered: true,
-                                language: 'sw'
+                                language: 'sw',
                             }
                         }
                     }
@@ -92,7 +92,7 @@ describe("api", function() {
                     .then(function(user) {
                         assert.deepEqual(user, {
                             registered: true,
-                            language: 'sw'
+                            language: 'sw',
                         });
                     });
             });
@@ -135,7 +135,8 @@ describe("api", function() {
                             poll: {
                                 id: '1234',
                                 type: 'text',
-                                question: 'What is your name?'
+                                question: 'What is your name?',
+                                is_registration_end: false
                             }
                         }
                     }
@@ -148,7 +149,8 @@ describe("api", function() {
                         assert.deepEqual(poll, {
                             id: '1234',
                             type: 'text',
-                            question: 'What is your name?'
+                            question: 'What is your name?',
+                            is_registration_end: false
                         });
                     });
             });
@@ -170,7 +172,8 @@ describe("api", function() {
                                 poll: {
                                     id: null,
                                     type: 'none',
-                                    question: 'Hello!'
+                                    question: 'Hello!',
+                                    is_registration_end: false
                                 }
                             }
                         }, {
@@ -188,7 +191,8 @@ describe("api", function() {
                             assert.deepEqual(poll, {
                                 id: null,
                                 type: 'none',
-                                question: 'Hello!'
+                                question: 'Hello!',
+                                is_registration_end: false
                             });
                         });
                 });
@@ -239,7 +243,8 @@ describe("api", function() {
                                 poll: {
                                     id: null,
                                     type: 'none',
-                                    question: 'Hello!'
+                                    question: 'Hello!',
+                                    is_registration_end: false
                                 }
                             }
                         }, {
@@ -248,7 +253,8 @@ describe("api", function() {
                                 poll: {
                                     id: null,
                                     type: 'none',
-                                    question: 'Welcome!'
+                                    question: 'Welcome!',
+                                    is_registration_end: false
                                 }
                             }
                         }, {
@@ -257,7 +263,8 @@ describe("api", function() {
                                 poll: {
                                     id: '1234',
                                     type: 'text',
-                                    question: 'What is your name?'
+                                    question: 'What is your name?',
+                                    is_registration_end: false
                                 }
                             }
                         }]
@@ -270,7 +277,8 @@ describe("api", function() {
                             assert.deepEqual(poll, {
                                 id: '1234',
                                 type: 'text',
-                                question: 'What is your name?'
+                                question: 'What is your name?',
+                                is_registration_end: false
                             });
                         });
                 });
@@ -292,7 +300,8 @@ describe("api", function() {
                                 poll: {
                                     id: null,
                                     type: 'none',
-                                    question: 'Hello!'
+                                    question: 'Hello!',
+                                    is_registration_end: false
                                 }
                             }
                         }, {
@@ -301,7 +310,8 @@ describe("api", function() {
                                 poll: {
                                     id: '1234',
                                     type: 'text',
-                                    question: 'What is your name?'
+                                    question: 'What is your name?',
+                                    is_registration_end: false
                                 }
                             }
                         }]
@@ -314,7 +324,55 @@ describe("api", function() {
                             assert.deepEqual(poll, {
                                 id: null,
                                 type: 'none',
-                                question: 'Hello!'
+                                question: 'Hello!',
+                                is_registration_end: false
+                            });
+                        });
+                });
+
+                it("should not get the next poll if the poll ends registration",
+                function() {
+                    api.http.fixtures.add({
+                        request: {
+                            method: 'GET',
+                            url: [
+                                'http://example.com',
+                                'ureporters/vumi_go_sms/%2B256775551122',
+                                'polls/current'
+                            ].join('/')
+                        },
+                        responses: [{
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: null,
+                                    type: 'none',
+                                    question: 'Congratulations!',
+                                    is_registration_end: true
+                                }
+                            }
+                        }, {
+                            data: {
+                                success: true,
+                                poll: {
+                                    id: '1234',
+                                    type: 'text',
+                                    question: 'What is your name?',
+                                    is_registration_end: false
+                                }
+                            }
+                        }]
+                    });
+
+                    return ureport
+                        .ureporters('+256775551122')
+                        .polls.current()
+                        .then(function(poll) {
+                            assert.deepEqual(poll, {
+                                id: null,
+                                type: 'none',
+                                question: 'Congratulations!',
+                                is_registration_end: true
                             });
                         });
                 });
@@ -336,7 +394,8 @@ describe("api", function() {
                                 poll: {
                                     id: null,
                                     type: 'none',
-                                    question: 'Hello!'
+                                    question: 'Hello!',
+                                    is_registration_end: false
                                 }
                             }
                         }, {
@@ -345,7 +404,8 @@ describe("api", function() {
                                 poll: {
                                     id: '1234',
                                     type: 'text',
-                                    question: 'What is your name?'
+                                    question: 'What is your name?',
+                                    is_registration_end: false
                                 }
                             }
                         }]
@@ -358,7 +418,8 @@ describe("api", function() {
                             assert.deepEqual(poll, {
                                 id: '1234',
                                 type: 'text',
-                                question: 'What is your name?'
+                                question: 'What is your name?',
+                                is_registration_end: false
                             });
                         });
                 });
@@ -380,7 +441,8 @@ describe("api", function() {
                                 poll: {
                                     id: null,
                                     type: 'none',
-                                    question: 'Hello!'
+                                    question: 'Hello!',
+                                    is_registration_end: false
                                 }
                             }
                         }, {
@@ -389,7 +451,8 @@ describe("api", function() {
                                 poll: {
                                     id: '1234',
                                     type: 'text',
-                                    question: 'What is your name?'
+                                    question: 'What is your name?',
+                                    is_registration_end: false
                                 }
                             }
                         }]
@@ -402,7 +465,8 @@ describe("api", function() {
                             assert.deepEqual(poll, {
                                 id: '1234',
                                 type: 'text',
-                                question: 'Hello! What is your name?'
+                                question: 'Hello! What is your name?',
+                                is_registration_end: false
                             });
                         });
                 });
