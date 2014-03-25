@@ -128,7 +128,7 @@ describe("app", function() {
                                 content: "Congratulations, you are now registered!",
                                 continue_session: false
                             })
-                            .check.user.state('states:register:end')
+                            .check.user.state('states:start')
                             .run();
                     });
                 });
@@ -183,7 +183,7 @@ describe("app", function() {
                             .check.reply([
                                 "There is currently no poll available,",
                                 "please try again later"].join(' '))
-                            .check.user.state('states:poll:none')
+                            .check.user.state('states:start')
                             .run();
                     });
                 });
@@ -215,7 +215,7 @@ describe("app", function() {
                                 "There are no polls to see results for at",
                                 "the moment, please try again later."
                             ].join(' '))
-                            .check.user.state('states:results:empty')
+                            .check.user.state('states:start')
                             .run();
                     });
                 });
@@ -227,7 +227,7 @@ describe("app", function() {
                     return tester
                         .setup.user.state('states:results:empty')
                         .start()
-                        .check.user.state('states:main_menu')
+                        .check.user.state('states:start')
                         .run();
                 });
             });
@@ -337,7 +337,7 @@ describe("app", function() {
                             "22 - 31: 2500",
                             "32 - 41: 833"
                         ].join('\n'))
-                        .check.user.state('states:results:view')
+                        .check.user.state('states:start')
                         .run();
                 });
             });
@@ -349,7 +349,7 @@ describe("app", function() {
                         .setup.user.state.creator_opts({poll_id: 'poll_1'})
                         .input('2')
                         .check.reply("Thank you for using Ureport.")
-                        .check.user.state('states:end')
+                        .check.user.state('states:start')
                         .run();
                 });
             });
@@ -367,7 +367,7 @@ describe("app", function() {
                         "22 - 31: 2500",
                         "32 - 41: 833"
                     ].join('\n'))
-                    .check.user.state('states:results:view')
+                    .check.user.state('states:start')
                     .run();
             });
         });
@@ -378,7 +378,7 @@ describe("app", function() {
                     .setup.user.state('states:results:view')
                     .setup.user.state.creator_opts({poll_id: 'poll_1'})
                     .start()
-                    .check.user.state('states:main_menu')
+                    .check.user.state('states:start')
                     .run();
             });
         });
@@ -407,7 +407,7 @@ describe("app", function() {
                         .setup.user.state('states:reports:submit')
                         .input("report text")
                         .check.reply("Thank you for your report.")
-                        .check.user.state('states:reports:submit:accepted')
+                        .check.user.state('states:start')
                         .run();
                 });
 
@@ -418,7 +418,7 @@ describe("app", function() {
                         .setup.user.state('states:reports:submit')
                         .input("report text")
                         .check.reply("Thank you for your msg.")
-                        .check.user.state('states:reports:submit:accepted')
+                        .check.user.state('states:start')
                         .run();
                 });
             });
@@ -455,7 +455,7 @@ describe("app", function() {
                 return tester
                     .setup.user.state('states:reports:submit:accepted')
                     .start()
-                    .check.user.state('states:main_menu')
+                    .check.user.state('states:start')
                     .run();
             });
         });
@@ -465,7 +465,7 @@ describe("app", function() {
                 return tester
                     .setup.user.state('states:end')
                     .start()
-                    .check.user.state('states:main_menu')
+                    .check.user.state('states:start')
                     .run();
             });
         });
