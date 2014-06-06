@@ -1,4 +1,5 @@
 var assert = require('assert');
+var _ = require('lodash');
 
 describe("states", function() {
     var vumigo = require('vumigo_v02');
@@ -40,10 +41,13 @@ describe("states", function() {
 
         describe(".translate", function() {
             it("should translate its 'total responses' label", function() {
-                assert.deepEqual(state.total_responses_label, {
-                    method: 'gettext',
-                    args: ['Total responses']
-                });
+                assert.deepEqual(
+                    _.pick(state.total_responses_label, ['args', 'ctx', 'method']),
+                    {
+                        args: ['Total responses'],
+                        ctx: {},
+                        method: 'gettext',
+                    });
 
                 state.translate(i18n);
 
