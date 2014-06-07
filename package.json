@@ -21,13 +21,15 @@
   "homepage": "https://github.com/praekelt/vumi-ureport",
   "dependencies": {
     "vumigo_v02": "~0.2",
+    "lodash": "~2.4.1",
     "q": "~0.9"
   },
   "devDependencies": {
     "mocha-as-promised": "~2.0.0",
-    "grunt": "~0.4.1",
+    "grunt": "~0.4.4",
     "grunt-contrib-watch": "~0.5.1",
     "grunt-mocha-test": "~0.6.2",
-    "grunt-contrib-concat": "~0.3.0"
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-cli": "~0.1.13"
   }
 }
